@@ -1,7 +1,7 @@
 # BaristaVR
 An in-the-works Barista VR arcade game, in which the player is challenged to complete multiple customer orders using realistic barista equipment including a bean grinder, espresso machine/steam wand, and more.
 
-This game will in theory ultimately play somewhat like <a href="https://store.steampowered.com/app/530120/VR_The_Diner_Duo/" onclick="return ! window.open(this.href);">VR The Diner Duo</a> (probably minus the co-op). Customers will come up, place a procedurally generated order (medium vanilla latte, large iced coffee with cream, etc.), and the player will have to use the equipment at their disposal to quickly and correctly craft the beverages. 
+This game will in theory ultimately play somewhat like <a href="https://store.steampowered.com/app/530120/VR_The_Diner_Duo/">VR The Diner Duo</a> (probably minus the co-op). Customers will come up, place a procedurally generated order (medium vanilla latte, large iced coffee with cream, etc.), and the player will have to use the equipment at their disposal to quickly and correctly craft the beverages. 
 
 # Where the game stands now
 Currently, the game is little more than a tech demo. I've been working on and off for a long time on perfecting the basic mechanics (interacting with the machines, pouring liquids from one container to another, and getting scaling and interactivity feeling smooth and natural). So far, the following features are implemented with varying levels of quality:
