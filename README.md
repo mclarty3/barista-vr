@@ -45,6 +45,9 @@ As far as goals for how the game will play once the foundation is in place:
 - An improvement to how liquid is rendered
     - Currently, it's just a lot of tiny sphere prefabs acting as 'drops' of liquid. I'd like to maybe use marching cubes for a more detailed liquid, though that's quite a bit beyond me as of now.
 - Other goods for customers to order, like pastries, blended drinks, and teas
+- **Make it an actual game!**
+    - I'll of course be implementing menu systems, VR quality of life settings (scaling the play area, etc.), and other systems and features to turn it from a tech demo to a playable game.
+        - This will probably end up being 80% of the work, right?
 
 ---
 
