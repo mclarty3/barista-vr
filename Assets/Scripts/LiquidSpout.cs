@@ -11,6 +11,20 @@ public class LiquidSpout : MonoBehaviour
     public int drops = 10;
     public int dropsPerSecond = -1;
 
+    [Header("Pour settings")]
+    [Tooltip("The minimum number of drops that will be instantiated each FixedUpdate")]
+    public int minDropsPerFrame = 1;
+    [Tooltip("The maximum number of drops that will be instantiated each FixedUpdate")]
+    public int maxDropsPerFrame = 25;
+    [Tooltip("The multiplier for random drop position variations within a unit sphere surrounding the spout")]
+    public float dropPositionOffset = 0.05f;
+    [Tooltip("The minimum multiplier for random drop size variations")]
+    public float dropMinScaleMultiplier = 0.25f;
+    [Tooltip("The maximum multiplier for random drop size variations")]
+    public float dropMaxScaleMultiplier = 1.25f;
+    [Tooltip("Force multiplier to determine how heavily the drops are pushed towards the up vector of the spout")]
+    public float pourForceMultipilier = 200;
+
     private Vector3 liquidOutVect;
     private float lastDropTime;
 
@@ -31,19 +45,8 @@ public class LiquidSpout : MonoBehaviour
     {
         if (angleDependent) {
             float angle = Vector3.Angle(Vector3.up, liquidOutVect);
-
-            // Pour liquid
             if (angle > 90) {
-                float modifier = (angle / 90) - 1;  // Clamp angle between 0 and 1
-                drops = Mathf.FloorToInt(Mathf.Lerp(5, 20, modifier));
-                for (int i = 0; i < drops; i++) {
-                    GameObject oneSpill = Instantiate(dropPrefab);
-                    oneSpill.transform.position = this.gameObject.transform.position + Random.insideUnitSphere * 0.05f;
-                    oneSpill.transform.localScale *= Random.Range(0.45f, 0.65f);
-                    oneSpill.GetComponent<Renderer>().material.color = dropColour;
-                    Vector3 force = new Vector3(Random.value - 0.5f, Random.value * 0.1f - 0.2f, Random.value - 0.5f);
-                    oneSpill.GetComponent<Rigidbody>().AddForce(force);
-                }
+                PourLiquid(angle: angle);
             }
         } else if (active && dropsPerSecond == -1) {
             for (int i = 0; i < drops; i++) {
@@ -64,6 +67,25 @@ public class LiquidSpout : MonoBehaviour
                 oneSpill.GetComponent<Rigidbody>().AddForce(force);
                 lastDropTime = Time.time;
             }
+        }
+    }
+
+    void PourLiquid(int drops = -1, float modifier = -1, float angle = -1) {
+        if (drops == -1) {
+            if (modifier == -1) {
+                modifier = angle == -1 ? Random.value : (angle / 90) - 1;
+            }
+            drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, modifier));
+        }
+
+        for (int i = 0; i < drops; i++) {
+            GameObject oneSpill = Instantiate(dropPrefab);
+            oneSpill.transform.position = this.gameObject.transform.position + Random.insideUnitSphere * dropPositionOffset;
+            oneSpill.transform.localScale *= Random.Range(dropMinScaleMultiplier, dropMaxScaleMultiplier);
+            oneSpill.GetComponent<Renderer>().material.color = dropColour;
+            Vector3 force = new Vector3(Random.value - 0.5f, Random.value * 0.1f - 0.2f, Random.value - 0.5f);
+            Vector3 pourForce = transform.up.normalized * pourForceMultipilier * (modifier + 0.5f);
+            oneSpill.GetComponent<Rigidbody>().AddForce(force + pourForce);
         }
     }
 
