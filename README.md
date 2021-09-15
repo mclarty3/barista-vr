@@ -38,7 +38,7 @@ If I work on this consistently enough, I can see these changes being done by the
 As far as goals for how the game will play once the foundation is in place:
 
 - A thorough and realistic NPC behaviour system
-    - NPCs will enter the shop, place and order, potentially have a seat in the coffee shop, and leave.
+    - NPCs will enter the shop, place an order, potentially have a seat in the coffee shop, and leave.
     - NPCs may get mad if their orders are wrong or take too long
 - A variety of increasingly nice coffee shops, with different sizes, layouts, customers, and drinks
 - An upgrade and decoration system for the coffee shop, allowing the player to customize their current shop to their liking with furniture, floor/wall decorations, and more
