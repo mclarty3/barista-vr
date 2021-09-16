@@ -26,7 +26,7 @@ public class ImprovedLiquid : MonoBehaviour
     public LiquidVolume lv;
 
     private Vector3 spillPoint;
-    private float meshVolume;
+    public float meshVolume;
     private Dictionary<Color, float> colorRatio = new Dictionary<Color, float>();
     private List<LiquidAmount> colorAmounts = new List<LiquidAmount>();
     private GameManager gameManager;
@@ -65,7 +65,7 @@ public class ImprovedLiquid : MonoBehaviour
         }
     }
 
-    // Called 50 times per second, independent of frame-rate (I finally get it!)
+    // TODO: Improve this, use similar code to LiquidSpout for more realistic pouring
     void FixedUpdate()
     {
         Vector3 spillPos;
@@ -78,11 +78,12 @@ public class ImprovedLiquid : MonoBehaviour
             lv.level -= GetLevelFromDrops(drops);
             Debug.Log(drops + " drops lowers level by " + GetLevelFromDrops(drops));
 
+            List<LiquidAmount> temp = new List<LiquidAmount>();
             foreach (LiquidAmount colorAmount in colorAmounts) {
                 colorAmount.amount -= GetLevelFromDrops(drops);
-                if (colorAmount.amount < 0.05f)
+                if (colorAmount.amount >= 0.05f)
                 {
-                    colorAmounts.Remove(colorAmount);
+                    temp.Add(colorAmount);
                 }
             }
         }

@@ -69,10 +69,11 @@ public class PortafilterDetector : MonoBehaviour
         portafilterAttached = detectorType;
         portafilter = obj.transform.parent.gameObject;
         portafilterHighlight.SetActive(false);
-        obj.transform.parent.GetComponent<Rigidbody>().isKinematic = true;
+        portafilter.transform.GetComponent<Rigidbody>().isKinematic = true;
+        groundsStartPos = portafilter.transform.Find("GroundsStartPos");
+        groundsEndPos = portafilter.transform.Find("GroundsEndPos");
 
         if (portafilterAttached == PortafilterPos.EspressoMachine) {
-            Debug.Log("test");
             espressoMachineText.text = "Press button\n\nto drip espresso";
         }
     }
@@ -83,6 +84,8 @@ public class PortafilterDetector : MonoBehaviour
         portafilter = null;
         portafilterHighlight.SetActive(true);
         obj.transform.parent.GetComponent<Rigidbody>().isKinematic = false;
+        groundsStartPos = null;
+        groundsEndPos = null;
 
         if (portafilterAttached == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "No portafilter";
