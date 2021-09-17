@@ -42,9 +42,9 @@ public class MCBlob: MonoBehaviour {
 	/*Amount of cubes in X/Y/Z directions, Dimension will always be from -.5f to .5f in XYZ
 	  remember to call Regen() if changing!
     */
-	int _dimX=30;
-	int _dimY=30;
-	int _dimZ=30;
+	int _dimX=300;
+	int _dimY=300;
+	int _dimZ=300;
  
 	public int dimX {
 		get {return _dimX; }
@@ -482,21 +482,30 @@ public class MCBlob: MonoBehaviour {
         //Update FPS and counters every second
         if(lt+1<Time.time) {
 			lt=Time.time;
-			Text guit = GameObject.Find("guit").GetComponent<Text>();
-			guit.text = "T:"+triP+" V:"+vertP+" C:"+cubec+" FPS:"+(int)(1f/Time.deltaTime);
+			// Text guit = GameObject.Find("guit").GetComponent<Text>();
+			// guit.text = "T:"+triP+" V:"+vertP+" C:"+cubec+" FPS:"+(int)(1f/Time.deltaTime);
 		}
-		blobs[0][0]=.12f+.12f*(float)Mathf.Sin((float)Time.time*.50f);
-		//blobs[0][2]=.06f+.23f*(float)Mathf.Cos((float)Time.time*.2f);
-		blobs[1][0]=.12f+.12f*(float)Mathf.Sin((float)Time.time*.2f);
-		//blobs[1][2]=-.23f+.10f*(float)Mathf.Cos((float)Time.time*1f);
-		//blobs[2][1]=-.03f+.24f*(float)Mathf.Sin((float)Time.time*.35f);
+		// blobs[0][0]=.12f+.12f*(float)Mathf.Sin((float)Time.time*.50f);
+		// blobs[0][2]=.06f+.23f*(float)Mathf.Cos((float)Time.time*.2f);
+		// blobs[1][0]=.12f+.12f*(float)Mathf.Sin((float)Time.time*.2f);
+		// blobs[1][2]=-.23f+.10f*(float)Mathf.Cos((float)Time.time*1f);
+		// blobs[2][1]=-.03f+.24f*(float)Mathf.Sin((float)Time.time*.35f);
 		// blobs[3][1]=.126f+.10f*(float)Mathf.Cos((float)Time.time*.1f);
 		// blobs[4][0]=.206f+.1f*(float)Mathf.Cos((float)Time.time*.5f);
 		// blobs[4][1]=.056f+.2f*(float)Mathf.Sin((float)Time.time*.3f);
 		// blobs[4][2]=.25f+.08f*(float)Mathf.Cos((float)Time.time*.2f);
  
         //transform.Rotate(Time.deltaTime*10f,0,Time.deltaTime*.6f);
- 
+		foreach (float[] blob in blobs) {
+			for (int i = 0; i < 3; i++) {
+				blob[i] += (UnityEngine.Random.value-.5f)*.01f;
+				if (blob[i] <= 0) {
+					blob[i] = 0;
+				} else if (blob[i] >= 1) {
+					blob[i] = 1;
+				}
+			}
+		} 
 		doFrame();	
  
  
@@ -505,12 +514,15 @@ public class MCBlob: MonoBehaviour {
 	//Unity and Sample Specific
 	void Start () {
 		lt=0f;
-		blobs=new float[2][];
-		blobs[0]=new float[]{.16f,.26f,.16f,.13f};
-		blobs[1]=new float[]{.13f,-.134f,.35f,.12f};
-		//blobs[2]=new float[]{-.18f,.125f,-.25f,.16f};
-		// blobs[3]=new float[]{-.13f,.23f,.255f,.13f};		
-		// blobs[4]=new float[]{-.18f,.125f,.35f,.12f};
+		int num_blobs = 10;
+		blobs=new float[num_blobs][];
+		for (int i = 0; i < num_blobs; i++) {
+			blobs[i] = new float[4];
+			blobs[i][0] = UnityEngine.Random.value * 0.25f;
+			blobs[i][1] = UnityEngine.Random.value * 0.25f;
+			blobs[i][2] = UnityEngine.Random.value * 0.25f;
+			blobs[i][3] = UnityEngine.Random.value * 0.25f;
+		}
  
 	    isoLevel=1.95f;
  
