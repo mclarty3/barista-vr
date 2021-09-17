@@ -70,23 +70,34 @@ public class ImprovedLiquid : MonoBehaviour
     {
         Vector3 spillPos;
         float spillAmount;
-        if (lv.GetSpillPoint(out spillPos, out spillAmount)) {
-            int drops = Mathf.FloorToInt(Mathf.Lerp(5, 15, spillAmount / 0.5f));
-            for (int i = 0; i < drops; i++) {
-                SpillDrop(spillPos);
-            }
-            lv.level -= GetLevelFromDrops(drops);
-            Debug.Log(drops + " drops lowers level by " + GetLevelFromDrops(drops));
+        // if (lv.GetSpillPoint(out spillPos, out spillAmount)) {
+        //     int drops = Mathf.FloorToInt(Mathf.Lerp(5, 15, spillAmount / 0.5f));
+        //     for (int i = 0; i < drops; i++) {
+        //         SpillDrop(spillPos);
+        //     }
+        //     lv.level -= GetLevelFromDrops(drops);
+        //     Debug.Log(drops + " drops lowers level by " + GetLevelFromDrops(drops));
 
-            List<LiquidAmount> temp = new List<LiquidAmount>();
-            foreach (LiquidAmount colorAmount in colorAmounts) {
-                colorAmount.amount -= GetLevelFromDrops(drops);
-                if (colorAmount.amount >= 0.05f)
-                {
-                    temp.Add(colorAmount);
-                }
-            }
+        //     List<LiquidAmount> temp = new List<LiquidAmount>();
+        //     foreach (LiquidAmount colorAmount in colorAmounts) {
+        //         colorAmount.amount -= GetLevelFromDrops(drops);
+        //         if (colorAmount.amount >= 0.05f)
+        //         {
+        //             temp.Add(colorAmount);
+        //         }
+        //     }
+        // }
+        if (lv.GetSpillPoint(out spillPos, out spillAmount)) {
+            NewPour(spillPos, spillAmount);
         }
+
+    }
+    
+    private void NewPour(Vector3 spillPos, float spillAmount)
+    {
+        int drops = Mathf.FloorToInt(Mathf.Lerp(5, 15, spillAmount / 0.5f));
+        LiquidSpout.PourLiquid(spillPos, spillPos - transform.position, 1, 25, liquidDropPrefab, 0.05f, 0.25f, 1.25f, lv.liquidColor1, 200, drops);
+        lv.level -= GetLevelFromDrops(drops);
     }
 
     private void SpillDrop(Vector3 spillPos)
