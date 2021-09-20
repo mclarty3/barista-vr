@@ -28,13 +28,15 @@ public class PortafilterDetector : MonoBehaviour
     public PortafilterPos detectorType;
     public Text espressoMachineText;
 
-    private GameObject portafilter;
+    // private GameObject portafilter;
+    private Portafilter portafilter;
     private GameObject portafilterHighlight;
     private GameManager gm;
 
     // Start is called before the first frame update
     void Start()
     {
+        portafilter = null;
         gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         portafilterHighlight = this.transform.GetChild(0).gameObject;
         portafilterHighlight.SetActive(false);
@@ -60,8 +62,10 @@ public class PortafilterDetector : MonoBehaviour
                     Debug.Log("Attaching because portafilterAttached = " + portafilterAttached);
                     Attach(other.gameObject);
                 }
-            } else {
+            } else if (portafilter != null) {
                 Detach(other.gameObject);
+            } else if (!portafilterHighlight.activeSelf) {
+                portafilterHighlight.SetActive(true);
             }
         }
     }
@@ -74,13 +78,12 @@ public class PortafilterDetector : MonoBehaviour
     void Attach(GameObject obj)
     {
         portafilterAttached = detectorType;
-        portafilter = obj.transform.parent.gameObject;
+        portafilter = obj.transform.parent.gameObject.GetComponent<Portafilter>();
+        portafilter.Attach(detectorType == PortafilterPos.EspressoMachine ? Portafilter.AttachmentStatus.EspressoMachine : 
+                                                                            Portafilter.AttachmentStatus.BeanGrinder);
         portafilterHighlight.SetActive(false);
-        portafilter.transform.GetComponent<Rigidbody>().isKinematic = true;
-        groundsStartPos = portafilter.transform.Find("GroundsStartPos");
-        groundsEndPos = portafilter.transform.Find("GroundsEndPos");
 
-        if (portafilterAttached == PortafilterPos.EspressoMachine) {
+        if (detectorType == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "Press button\n\nto drip espresso";
             espressoMachineAudioSource.clip = portafilterAttachSound;
             espressoMachineAudioSource.Play();
@@ -89,108 +92,43 @@ public class PortafilterDetector : MonoBehaviour
 
     void Detach(GameObject obj)
     {
-        if (portafilterAttached == PortafilterPos.EspressoMachine) {
+        if (detectorType == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "No portafilter";
             espressoMachineAudioSource.clip = portafilterDetachSound;
             espressoMachineAudioSource.Play();
         }
+        portafilter.Detach();
         portafilterAttached = PortafilterPos.None;
         portafilter = null;
         portafilterHighlight.SetActive(true);
-        obj.transform.parent.GetComponent<Rigidbody>().isKinematic = false;
-        groundsStartPos = null;
-        groundsEndPos = null;
     }
 
     /* Filling portafilter with grounds from coffee grinder */
 
     public void TryFillPortafilter() 
     {
-        if (portafilterAttached == PortafilterPos.Grinder && gm.espressoStatus == GameManager.EspressoStatus.None)
+        if (portafilter != null && 
+            detectorType == PortafilterPos.Grinder && 
+            portafilter.espressoStatus == Portafilter.EspressoStatus.None) 
         {
-            FillPortafilter();
-        }
-    }
-
-    void FillPortafilter()
-    {
-        if (portafilter != null) {
-            SetPortafilterHover(false);
+            portafilter.Fill();
             beanGrinderAudioSource.Play();
-            gm.espressoStatus = GameManager.EspressoStatus.Fresh;
-            GameObject grounds = portafilter.transform.Find("CoffeeGrounds").gameObject;
-            grounds.SetActive(true);
-            grounds.GetComponent<Renderer>().material = freshGroundsMat;
-            grounds.transform.position = groundsStartPos.position;
-            StartCoroutine("MoveGrounds", grounds);
         }
     }
 
-    IEnumerator MoveGrounds(GameObject grounds)
-    {
-        Vector3 currentPos = groundsStartPos.position;
-        float t = 0f;
-        while (t < 1) {
-            t += Time.deltaTime / 6;
-            grounds.transform.position = Vector3.Lerp(currentPos, groundsEndPos.position, t);
-            yield return null;
-        }     
-        SetPortafilterHover(true);
-    }
-
-    /* Dripping espresso from fresh filled portafilter */
     public void TryDripEspresso()
     {
-        if (portafilterAttached == PortafilterPos.EspressoMachine && gm.espressoStatus == GameManager.EspressoStatus.Fresh) {
-            DripEspresso();
-        }
-    }
-
-    public void DripEspresso()
-    {
-        if (portafilter != null) {
-            SetPortafilterHover(false);
+        if (portafilter != null && 
+            portafilter.attachmentStatus == Portafilter.AttachmentStatus.EspressoMachine && 
+            portafilter.espressoStatus == Portafilter.EspressoStatus.Fresh) 
+        {
             espressoMachineAudioSource.volume = 1;
             espressoMachineAudioSource.clip = espressoDripSound;
             espressoMachineAudioSource.Play();
             espressoMachineAudioSource.volume = 0.5f;
-            gm.espressoStatus = GameManager.EspressoStatus.Used;
-            portafilter.transform.Find("CoffeeGrounds").gameObject.GetComponent<Renderer>().material = usedGroundsMat;
-            portafilter.transform.Find("LiquidSpout1").GetComponent<LiquidSpout>().active = true;
-            portafilter.transform.Find("LiquidSpout2").GetComponent<LiquidSpout>().active = true;
             espressoMachineText.text = "Dripping\n\nespresso...";
-            StartCoroutine("StartEspressoStream");
+            portafilter.DripEspresso();
         }
     }
 
-    IEnumerator StartEspressoStream()
-    {
-        float t = 0f;
-        while (t < 1) {
-            t += Time.deltaTime / 19;
-            yield return null;
-        }     
-        SetPortafilterHover(true);
-        portafilter.transform.Find("LiquidSpout1").GetComponent<LiquidSpout>().active = false;
-        portafilter.transform.Find("LiquidSpout2").GetComponent<LiquidSpout>().active = false;
-        espressoMachineText.text = "Remove\n\nportafilter";
-    }
-
-    void SetPortafilterHover(bool toggle)
-    {
-        if (toggle == true)
-        {
-            foreach (IgnoreHovering ignoreHovering in portafilter.GetComponentsInChildren<IgnoreHovering>())
-            {
-            Destroy(ignoreHovering);
-            }
-            
-        }
-        else {
-            foreach (Collider collider in portafilter.GetComponentsInChildren<Collider>())
-            {
-                collider.gameObject.AddComponent<IgnoreHovering>();
-            }
-        }
-    }
 }
