@@ -17,7 +17,11 @@ public class PortafilterDetector : MonoBehaviour
     public Transform portafilterPos;
     public Material freshGroundsMat;
     public Material usedGroundsMat;
-    public AudioSource audioSource;
+    public AudioSource beanGrinderAudioSource;
+    public AudioSource espressoMachineAudioSource;
+    public AudioClip portafilterAttachSound;
+    public AudioClip portafilterDetachSound;
+    public AudioClip espressoDripSound;
     public Transform groundsStartPos;
     public Transform groundsEndPos;
     [SerializeField]
@@ -34,6 +38,9 @@ public class PortafilterDetector : MonoBehaviour
         gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         portafilterHighlight = this.transform.GetChild(0).gameObject;
         portafilterHighlight.SetActive(false);
+        portafilterAttachSound = Resources.Load<AudioClip>("Audio/PortafilterAttach");
+        portafilterDetachSound = Resources.Load<AudioClip>("Audio/PortafilterDetach");
+        espressoDripSound = Resources.Load<AudioClip>("Audio/EspressoMachine");
     }
 
     // Update is called once per frame
@@ -75,6 +82,8 @@ public class PortafilterDetector : MonoBehaviour
 
         if (portafilterAttached == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "Press button\n\nto drip espresso";
+            espressoMachineAudioSource.clip = portafilterAttachSound;
+            espressoMachineAudioSource.Play();
         }
     }
 
@@ -82,6 +91,8 @@ public class PortafilterDetector : MonoBehaviour
     {
         if (portafilterAttached == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "No portafilter";
+            espressoMachineAudioSource.clip = portafilterDetachSound;
+            espressoMachineAudioSource.Play();
         }
         portafilterAttached = PortafilterPos.None;
         portafilter = null;
@@ -105,7 +116,7 @@ public class PortafilterDetector : MonoBehaviour
     {
         if (portafilter != null) {
             SetPortafilterHover(false);
-            audioSource.Play();
+            beanGrinderAudioSource.Play();
             gm.espressoStatus = GameManager.EspressoStatus.Fresh;
             GameObject grounds = portafilter.transform.Find("CoffeeGrounds").gameObject;
             grounds.SetActive(true);
@@ -139,7 +150,10 @@ public class PortafilterDetector : MonoBehaviour
     {
         if (portafilter != null) {
             SetPortafilterHover(false);
-            audioSource.Play();
+            espressoMachineAudioSource.volume = 1;
+            espressoMachineAudioSource.clip = espressoDripSound;
+            espressoMachineAudioSource.Play();
+            espressoMachineAudioSource.volume = 0.5f;
             gm.espressoStatus = GameManager.EspressoStatus.Used;
             portafilter.transform.Find("CoffeeGrounds").gameObject.GetComponent<Renderer>().material = usedGroundsMat;
             portafilter.transform.Find("LiquidSpout1").GetComponent<LiquidSpout>().active = true;
