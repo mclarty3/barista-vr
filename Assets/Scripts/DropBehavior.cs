@@ -31,12 +31,13 @@ public class DropBehavior : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.LogWarning("TriggerEnter");
         if (other.gameObject.tag != "LiquidCatcher") {
             Destroy(gameObject);
-            Debug.Log("Destroyed");
+            // Debug.Log("Destroyed");
         }
         else {
-            Debug.Log("Adding liquid for 1 drop");
+            // Debug.Log("Adding liquid for 1 drop");
             Destroy(gameObject);
             LiquidCatcher temp;
             if (other.TryGetComponent<LiquidCatcher>(out temp))
@@ -48,7 +49,7 @@ public class DropBehavior : MonoBehaviour
     {
         if (other.collider.gameObject.tag != "LiquidCatcher") {
             Destroy(gameObject);
-            Debug.Log("Destroyed. Collided with " + other.collider.gameObject.name);
+            // Debug.Log("Destroyed. Collided with " + other.collider.gameObject.name);
         }
         else {
             Debug.Log("Adding liquid for 1 drop");

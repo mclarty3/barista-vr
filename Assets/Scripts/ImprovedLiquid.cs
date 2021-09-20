@@ -20,10 +20,14 @@ public class ImprovedLiquid : MonoBehaviour
     }
 
     public GameObject liquidDropPrefab;
-    public int numDropsPerSecond = 10;
+    public int minDropsPerFrame = 5;
+    public int maxDropsPerFrame = 15;
+    public float pourPositionOffset = 0.05f;
+    public float pourForceModifier = 1.5f;
     public GameObject liquidSurfaceCollider;
     
     public LiquidVolume lv;
+    public bool infiniteLiquid = false;
 
     private Vector3 spillPoint;
     public float meshVolume;
@@ -32,7 +36,7 @@ public class ImprovedLiquid : MonoBehaviour
     private GameManager gameManager;
     private float referenceVolume;
     private int numOzInReferenceVolume = 20;
-    public int dropsPerOz = 100;
+    public int dropsPerOz = 50;
 
     // Start is called before the first frame update
     void Start()
@@ -88,21 +92,26 @@ public class ImprovedLiquid : MonoBehaviour
         //     }
         // }
         if (lv.GetSpillPoint(out spillPos, out spillAmount)) {
-            NewPour(spillPos, spillAmount);
+            Vector3 spillPos_local = transform.InverseTransformPoint(spillPos);
+            Vector3 offsetVector = Vector3.ProjectOnPlane(transform.InverseTransformDirection(spillPos), transform.up).normalized;
+            NewPour(spillPos + offsetVector * pourPositionOffset, spillAmount);
         }
 
     }
     
     private void NewPour(Vector3 spillPos, float spillAmount)
     {
-        int drops = Mathf.FloorToInt(Mathf.Lerp(5, 15, spillAmount / 0.5f));
-        LiquidSpout.PourLiquid(spillPos, spillPos - transform.position, 1, 25, liquidDropPrefab, 0.05f, 0.25f, 1.25f, lv.liquidColor1, 200, drops);
-        lv.level -= GetLevelFromDrops(drops);
+        int drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, (spillAmount) * 1.6f));
+        Debug.Log(drops);
+        LiquidSpout.PourLiquid(spillPos, -(spillPos - transform.position), 1, 25, liquidDropPrefab, 0.05f, 
+                               0.25f, 1.25f, lv.liquidColor1, pourForceModifier, drops: drops);
+        if (!infiniteLiquid)
+            lv.level -= GetLevelFromDrops(drops);
     }
 
     private void SpillDrop(Vector3 spillPos)
     {
-        Debug.Log("Spilling one drop");
+        // Debug.Log("Spilling one drop");
         GameObject oneDrop = Instantiate(liquidDropPrefab);
         oneDrop.transform.position = spillPos + Random.insideUnitSphere * 0.005f;
         oneDrop.transform.localScale *= Random.Range(0.45f, 0.65f);
@@ -114,7 +123,7 @@ public class ImprovedLiquid : MonoBehaviour
 
     public void AddDrop(DropBehavior drop) {
         lv.level += GetLevelFromDrops();
-        Debug.Log(1 + " drop raises level by " + GetLevelFromDrops());
+        // Debug.Log(1 + " drop raises level by " + GetLevelFromDrops());
 
         // Search colorAmounts for drop's colour
         bool hasColour = false;

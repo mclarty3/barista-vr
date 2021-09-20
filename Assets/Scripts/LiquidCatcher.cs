@@ -5,13 +5,13 @@ using LiquidVolumeFX;
 
 public class LiquidCatcher : MonoBehaviour
 {
-    public ImprovedLiquid improvedLiquid;
+    private ImprovedLiquid improvedLiquid;
 
     // Start is called before the first frame update
     void Start()
     {
         if (!gameObject.transform.parent.TryGetComponent<ImprovedLiquid>(out improvedLiquid)) {
-            Debug.Log(name + " has LiquidCatcher script but no ImprovedLiquid script");
+            Debug.LogWarning(name + " has LiquidCatcher script but no ImprovedLiquid script");
         }
     }
 

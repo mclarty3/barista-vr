@@ -23,7 +23,7 @@ public class LiquidSpout : MonoBehaviour
     [Tooltip("The maximum multiplier for random drop size variations")]
     public float dropMaxScaleMultiplier = 1.25f;
     [Tooltip("Force multiplier to determine how heavily the drops are pushed towards the up vector of the spout")]
-    public float pourForceMultipilier = 200;
+    public float pourForceMultipilier = 2;
 
     private Vector3 liquidOutVect;
     private float lastDropTime;
@@ -70,7 +70,7 @@ public class LiquidSpout : MonoBehaviour
         }
     }
 
-    void PourLiquid(int drops = -1, float modifier = -1, float angle = -1) {
+    void PourLiquid(int drops = -1, float modifier = -1, float angle = -1, float force_modifier = 1) {
         if (drops == -1) {
             if (modifier == -1) {
                 modifier = angle == -1 ? Random.value : (angle / 90) - 1;
@@ -83,7 +83,7 @@ public class LiquidSpout : MonoBehaviour
             oneSpill.transform.position = this.gameObject.transform.position + Random.insideUnitSphere * dropPositionOffset;
             oneSpill.transform.localScale *= Random.Range(dropMinScaleMultiplier, dropMaxScaleMultiplier);
             oneSpill.GetComponent<Renderer>().material.color = dropColour;
-            Vector3 force = new Vector3(Random.value - 0.5f, Random.value * 0.1f - 0.2f, Random.value - 0.5f);
+            Vector3 force = new Vector3((Random.value - 0.5f) * force_modifier, Random.value * 0.1f - 0.2f, (Random.value - 0.5f) * force_modifier);
             Vector3 pourForce = transform.up.normalized * pourForceMultipilier * (modifier + 0.5f);
             oneSpill.GetComponent<Rigidbody>().AddForce(force + pourForce);
         }
@@ -105,7 +105,7 @@ public class LiquidSpout : MonoBehaviour
             oneSpill.transform.localScale *= Random.Range(dropMinScaleMultiplier, dropMaxScaleMultiplier);
             oneSpill.GetComponent<Renderer>().material.color = dropColour;
             Vector3 force = new Vector3(Random.value - 0.5f, Random.value * 0.1f - 0.2f, Random.value - 0.5f);
-            Vector3 pourForce = pourDirection.normalized * pourForceMultipilier * (modifier + 0.5f);
+            Vector3 pourForce = pourDirection.normalized * (modifier + 0.5f) * pourForceMultipilier;
             oneSpill.GetComponent<Rigidbody>().AddForce(force + pourForce);
         }
         
