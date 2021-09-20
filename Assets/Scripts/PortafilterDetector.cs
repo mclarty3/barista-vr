@@ -80,16 +80,15 @@ public class PortafilterDetector : MonoBehaviour
 
     void Detach(GameObject obj)
     {
+        if (portafilterAttached == PortafilterPos.EspressoMachine) {
+            espressoMachineText.text = "No portafilter";
+        }
         portafilterAttached = PortafilterPos.None;
         portafilter = null;
         portafilterHighlight.SetActive(true);
         obj.transform.parent.GetComponent<Rigidbody>().isKinematic = false;
         groundsStartPos = null;
         groundsEndPos = null;
-
-        if (portafilterAttached == PortafilterPos.EspressoMachine) {
-            espressoMachineText.text = "No portafilter";
-        }
     }
 
     /* Filling portafilter with grounds from coffee grinder */
@@ -118,7 +117,7 @@ public class PortafilterDetector : MonoBehaviour
 
     IEnumerator MoveGrounds(GameObject grounds)
     {
-        Vector3 currentPos = grounds.transform.position;
+        Vector3 currentPos = groundsStartPos.position;
         float t = 0f;
         while (t < 1) {
             t += Time.deltaTime / 6;
