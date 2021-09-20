@@ -106,7 +106,21 @@ public class ImprovedLiquid : MonoBehaviour
         LiquidSpout.PourLiquid(spillPos, -(spillPos - transform.position), 1, 25, liquidDropPrefab, 0.05f, 
                                0.25f, 1.25f, lv.liquidColor1, pourForceModifier, drops: drops);
         if (!infiniteLiquid)
+        {
             lv.level -= GetLevelFromDrops(drops);
+            List<LiquidAmount> temp = new List<LiquidAmount>();
+            foreach (LiquidAmount colorAmount in colorAmounts) {
+                colorAmount.amount -= GetLevelFromDrops(drops);
+                if (colorAmount.amount >= 0.05f)
+                {
+                    temp.Add(colorAmount);
+                }
+            }
+            colorAmounts = temp;
+            foreach (LiquidAmount colorAmount in colorAmounts) {
+                lv.liquidColor1 = Color.Lerp(lv.liquidColor1, colorAmount.color, colorAmount.amount);
+            }
+        }
     }
 
     private void SpillDrop(Vector3 spillPos)

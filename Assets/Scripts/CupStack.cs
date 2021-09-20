@@ -13,8 +13,8 @@ public class CupStack : MonoBehaviour
     public Transform cupSpawnPoint;
 
     private bool grabbed = false;
-    private float leaveProjectedDistance = 0.065f;
-    private float leaveHeightDifference = 0.19f;
+    private float leaveProjectedDistance = 0.5f;
+    private float leaveHeightDifference = 2.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -34,9 +34,12 @@ public class CupStack : MonoBehaviour
         else if (grabbed) 
         {
             Vector3 grabbedCenter = grabbedCup.transform.Find("Pipe").GetComponent<Renderer>().bounds.center;
-            if (Vector2.Distance(Vector3.ProjectOnPlane(this.transform.position, Vector3.up), Vector3.ProjectOnPlane(grabbedCenter, Vector3.up)) >= leaveProjectedDistance ||
-                grabbedCenter.y - this.transform.position.y >= leaveHeightDifference) 
+            float projectedDistance = Vector2.Distance(Vector3.ProjectOnPlane(this.transform.position, Vector3.up),
+                                                       Vector3.ProjectOnPlane(grabbedCenter, Vector3.up));
+            float heightDistance = grabbedCenter.y - this.transform.position.y;
+            if (projectedDistance >= leaveProjectedDistance || heightDistance >= leaveHeightDifference) 
             {
+                Debug.Log("Leaving! Projected: " + projectedDistance + " Height: " + heightDistance);
                 OnCupExit();
                 grabbed = false;
             }
@@ -61,6 +64,8 @@ public class CupStack : MonoBehaviour
     void ToggleCupColliders(GameObject cup, bool active)
     {
         Collider[] cupColliders = cup.GetComponentsInChildren<Collider>();
+
+        Debug.Log(cupColliders.Length);
         
         foreach (Collider collider in cupColliders) {
             collider.enabled = active;
