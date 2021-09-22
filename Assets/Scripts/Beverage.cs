@@ -4,31 +4,28 @@ using UnityEngine;
 
 public class Beverage : MonoBehaviour
 {
-    public enum IngredientType 
-    {
-        Water,
-        Milk,
-        Espresso,
-        Coffee
 
-    }
-
-    public struct IngredientAmount
+    public class IngredientAmount
     {
-        public IngredientType ingredientType;
+        public Ingredient.IngredientType ingredientType;
         public float amount;
 
-        public IngredientAmount(IngredientType ingredientType, float amount)
+        public IngredientAmount()
+        {
+            ingredientType = Ingredient.IngredientType.Undefined;
+            amount = 0;
+        }
+        public IngredientAmount(Ingredient.IngredientType ingredientType, float amount)
         {
             this.ingredientType = ingredientType;
             this.amount = amount;
         }
-
     }
 
     public List<IngredientAmount> ingredients;
+    public Dictionary<Ingredient.IngredientType, float> ingredientAmounts;
 
-    public void AddIngredient(IngredientType ingredientType, float amount)
+    public void AddIngredient(Ingredient.IngredientType ingredientType, float amount)
     {
         int index = ContainsIngredient(ingredientType);
         if (index != -1)
@@ -40,7 +37,7 @@ public class Beverage : MonoBehaviour
         }
     }
 
-    public void RemoveIngredient(IngredientType ingredientType, float amount = -1)
+    public void RemoveIngredient(Ingredient.IngredientType ingredientType, float amount = -1)
     {
         int index = ContainsIngredient(ingredientType);
         if (index != -1)
@@ -55,12 +52,12 @@ public class Beverage : MonoBehaviour
         }
     }
 
-    public int ContainsIngredient(IngredientType ingredientType)
+    public int ContainsIngredient(Ingredient.IngredientType ingredientType)
     {
         return ingredients.FindIndex(x => x.ingredientType == ingredientType);
     }
 
-    public float GetIngredientAmount(IngredientType ingredientType)
+    public float GetIngredientAmount(Ingredient.IngredientType ingredientType)
     {
         int index = ContainsIngredient(ingredientType);
         if (index != -1)
@@ -79,7 +76,7 @@ public class Beverage : MonoBehaviour
         return total;
     }
 
-    public float GetIngredientPercentage(IngredientType ingredientType)
+    public float GetIngredientPercentage(Ingredient.IngredientType ingredientType)
     {
         int index = ContainsIngredient(ingredientType);
         if (index != -1)
