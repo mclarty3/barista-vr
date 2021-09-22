@@ -31,8 +31,10 @@ public class MilkSteaming : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (milk.lv.liquidSurfaceYPosition > steamWandBottom.position.y && milk.lv.liquidSurfaceYPosition < steamWandTop.position.y && 
-            Mathf.Abs(steamWandBottom.position.x - milk.lv.transform.position.x) <= 0.04f && Mathf.Abs(steamWandBottom.position.z - milk.lv.transform.position.z) <= 0.04f)
+        if (milk.lv.liquidSurfaceYPosition > steamWandBottom.position.y && 
+            milk.lv.liquidSurfaceYPosition < steamWandTop.position.y && 
+            Mathf.Abs(steamWandBottom.position.x - milk.lv.transform.position.x) <= 0.04f && 
+            Mathf.Abs(steamWandBottom.position.z - milk.lv.transform.position.z) <= 0.04f)
         {
             if (!touchingMilk) {
                 SetTouchingMilk(true);

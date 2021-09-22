@@ -33,9 +33,11 @@ public class CupStack : MonoBehaviour
         }
         else if (grabbed) 
         {
-            Vector3 grabbedCenter = grabbedCup.transform.Find("Pipe").GetComponent<Renderer>().bounds.center;
-            float projectedDistance = Vector2.Distance(Vector3.ProjectOnPlane(this.transform.position, Vector3.up),
-                                                       Vector3.ProjectOnPlane(grabbedCenter, Vector3.up));
+            Vector3 grabbedCenter = (grabbedCup.transform.Find("Pipe").
+                                     GetComponent<Renderer>().bounds.center);
+            float projectedDistance = Vector2.Distance(
+                Vector3.ProjectOnPlane(this.transform.position, Vector3.up),
+                Vector3.ProjectOnPlane(grabbedCenter, Vector3.up));
             float heightDistance = grabbedCenter.y - this.transform.position.y;
             if (projectedDistance >= leaveProjectedDistance || heightDistance >= leaveHeightDifference) 
             {
@@ -51,7 +53,8 @@ public class CupStack : MonoBehaviour
         ToggleCupColliders(dormantCup, false);
         dormantCup.GetComponent<Rigidbody>().isKinematic = false;
         grabbedCup = newCup;
-        newCup = Instantiate(cupPrefab, cupSpawnPoint.position, Quaternion.LookRotation(Vector3.back, Vector3.down)) as GameObject;
+        newCup = Instantiate(cupPrefab, cupSpawnPoint.position, 
+                             Quaternion.LookRotation(Vector3.back, Vector3.down)) as GameObject;
         newCup.GetComponent<Rigidbody>().isKinematic = true;
     }
 

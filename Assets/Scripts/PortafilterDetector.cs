@@ -79,8 +79,9 @@ public class PortafilterDetector : MonoBehaviour
     {
         portafilterAttached = detectorType;
         portafilter = obj.transform.parent.gameObject.GetComponent<Portafilter>();
-        portafilter.Attach(detectorType == PortafilterPos.EspressoMachine ? Portafilter.AttachmentStatus.EspressoMachine : 
-                                                                            Portafilter.AttachmentStatus.BeanGrinder);
+        portafilter.Attach(detectorType == PortafilterPos.EspressoMachine ? 
+                           Portafilter.AttachmentStatus.EspressoMachine : 
+                           Portafilter.AttachmentStatus.BeanGrinder);
         portafilterHighlight.SetActive(false);
 
         if (detectorType == PortafilterPos.EspressoMachine) {

@@ -110,7 +110,7 @@ public class Portafilter : MonoBehaviour
             }
         }
         else {
-            foreach (IgnoreHovering ignoreHovering in transform.GetComponentsInChildren<IgnoreHovering>()) {
+            foreach (var ignoreHovering in transform.GetComponentsInChildren<IgnoreHovering>()) {
                 Destroy(ignoreHovering);
             }
         }

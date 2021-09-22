@@ -6,22 +6,6 @@ using LiquidVolumeFX;
 
 public class ImprovedLiquid : MonoBehaviour
 {
-    // class LiquidAmount
-    // {
-    //     public Ingredient.IngredientType ingredientType = Ingredient.IngredientType.Undefined;
-    //     public Color color = Color.white;
-    //     public float amount = 0;
-
-    //     public LiquidAmount() { }
-
-    //     public LiquidAmount(Ingredient.IngredientType ingredientType, Color color, float amount) 
-    //     {
-    //         this.ingredientType = ingredientType;
-    //         this.color = color;
-    //         this.amount = amount;
-    //     }
-    // }
-
     [Tooltip("Set the ingredient if the container will contain liquid on scene start")]
     [SerializeField]
     public Ingredient.IngredientType ingredientType = Ingredient.IngredientType.Undefined;
@@ -40,7 +24,7 @@ public class ImprovedLiquid : MonoBehaviour
     private Vector3 spillPoint;
     public float meshVolume;
     private Dictionary<Color, float> colorRatio = new Dictionary<Color, float>();
-    // private List<LiquidAmount> amounts = new List<LiquidAmount>();
+
     [SerializeField]
     public Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
     private GameManager gameManager;
@@ -54,10 +38,8 @@ public class ImprovedLiquid : MonoBehaviour
         if (!TryGetComponent<LiquidVolume>(out lv)) {
             Debug.LogError(name + " has ImprovedLiquid script but no LiquidVolume script.");
         }
-        if (amounts.Count > 0) {
-            // UpdateFromIngredients();
-        } else if (lv.level > 0) {
-            // amounts.Add(new LiquidAmount(ingredientType, lv.liquidColor1, lv.level));
+
+        if (lv.level > 0) {
             Ingredient newIngredient = new Ingredient(ingredientType);
             amounts.Add(newIngredient, lv.level);
             temperature = newIngredient.temperature;
@@ -113,7 +95,6 @@ public class ImprovedLiquid : MonoBehaviour
     private void NewPour(Vector3 spillPos, float spillAmount)
     {
         int drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, spillAmount * 1.6f));
-
         LiquidSpout.PourLiquid(spillPos, -(spillPos - transform.position), 
                                new List<Ingredient>(amounts.Keys), lv.liquidColor1, temperature, 1, 25, 
                                liquidDropPrefab, 0.05f, 0.25f, 1.25f, pourForceModifier, drops);
@@ -131,9 +112,6 @@ public class ImprovedLiquid : MonoBehaviour
             }
             amounts = temp;
             lv.level -= lostLevel;
-            // foreach (KeyValuePair<Ingredient, float> amount in amounts) {
-            //     lv.liquidColor1 = Color.Lerp(lv.liquidColor1, amount.Key.color, amount.Value);
-            // }
         }
     }
 
@@ -162,26 +140,6 @@ public class ImprovedLiquid : MonoBehaviour
                             (ingredient.temperature * amount / newLevel));
         lv.level = newLevel;
     }
-
-    // public void UpdateFromIngredients() 
-    // {
-    //     if (amounts.Count == 0) return;
-    //     float temperature = 0;
-    //     Vector3 pigmentSpace = Vector3.zero;
-    //     float totalAmount = amounts.Sum(x => x.Value);
-    //     foreach (KeyValuePair<Ingredient, float> ingredientAmount in amounts) {
-    //         // Calculate colour
-    //         float weight = ingredientAmount.Value / totalAmount;
-    //         pigmentSpace += ToPigmentSpace(ingredientAmount.Key.color) * weight;
-
-    //         // Calculate temperature
-    //         temperature += ingredientAmount.Key.temperature * weight;
-    //     }
-
-    //     lv.level = totalAmount;
-    //     lv.liquidColor1 = FromPigmentSpace(pigmentSpace);
-    //     this.temperature = temperature;
-    // }
 
     public float GetVolumeFilled()
     {
