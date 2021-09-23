@@ -79,9 +79,7 @@ public class PortafilterDetector : MonoBehaviour
     {
         portafilterAttached = detectorType;
         portafilter = obj.transform.parent.gameObject.GetComponent<Portafilter>();
-        portafilter.Attach(detectorType == PortafilterPos.EspressoMachine ? 
-                           Portafilter.AttachmentStatus.EspressoMachine : 
-                           Portafilter.AttachmentStatus.BeanGrinder);
+        portafilter.detector = this;
         portafilterHighlight.SetActive(false);
 
         if (detectorType == PortafilterPos.EspressoMachine) {
@@ -119,9 +117,7 @@ public class PortafilterDetector : MonoBehaviour
 
     public void TryDripEspresso()
     {
-        if (portafilter != null && 
-            portafilter.attachmentStatus == Portafilter.AttachmentStatus.EspressoMachine && 
-            portafilter.espressoStatus == Portafilter.EspressoStatus.Fresh) 
+        if (portafilter != null && portafilter.detector.detectorType == PortafilterPos.EspressoMachine)
         {
             espressoMachineAudioSource.volume = 1;
             espressoMachineAudioSource.clip = espressoDripSound;
@@ -132,4 +128,9 @@ public class PortafilterDetector : MonoBehaviour
         }
     }
 
+    public void StopDripEspresso()
+    {
+        espressoMachineAudioSource.volume = 0.5f;
+        espressoMachineText.text = "Please remove portafilter";
+    }
 }

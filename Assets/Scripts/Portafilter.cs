@@ -12,13 +12,6 @@ public class Portafilter : MonoBehaviour
         Used
     }
 
-    public enum AttachmentStatus
-    {
-        None,
-        EspressoMachine,
-        BeanGrinder
-    }
-
     public Transform groundsStartPos;
     public Transform groundsEndPos;
     public float groundsSpeed = 1;
@@ -26,7 +19,8 @@ public class Portafilter : MonoBehaviour
     public Material usedGroundsMat;
 
     public EspressoStatus espressoStatus;
-    public AttachmentStatus attachmentStatus;
+    [System.NonSerialized]
+    public PortafilterDetector detector;
 
     public LiquidSpout lvSpout1;
     public LiquidSpout lvSpout2;
@@ -38,7 +32,7 @@ public class Portafilter : MonoBehaviour
     {
         grounds = transform.Find("CoffeeGrounds").gameObject;
         espressoStatus = EspressoStatus.None;
-        attachmentStatus = AttachmentStatus.None;
+        detector = null;
     }
 
     // Update is called once per frame
@@ -47,15 +41,15 @@ public class Portafilter : MonoBehaviour
         
     }
 
-    public void Attach(AttachmentStatus status) 
+    public void Attach(PortafilterDetector detector) 
     {
-        attachmentStatus = status;
+        this.detector = detector;
         transform.GetComponent<Rigidbody>().isKinematic = true;
     }
 
     public void Detach()
     {
-        attachmentStatus = AttachmentStatus.None;
+        detector = null;
         transform.GetComponent<Rigidbody>().isKinematic = false;
     }
 
@@ -78,14 +72,15 @@ public class Portafilter : MonoBehaviour
             grounds.transform.position = Vector3.Lerp(currentPos, groundsEndPos.position, t);
             yield return null;
         }     
+        ToggleHover(true);
     }
     public void DripEspresso()
     {
         ToggleHover(false);
-        espressoStatus = EspressoStatus.Used;
         grounds.GetComponent<Renderer>().material = usedGroundsMat;
         lvSpout1.active = true;
         lvSpout2.active = true;
+        espressoStatus = EspressoStatus.Used;
         StartCoroutine("StartEspressoStream");
     }
 
@@ -99,11 +94,12 @@ public class Portafilter : MonoBehaviour
         ToggleHover(true);
         lvSpout1.active = false;
         lvSpout2.active = false;
+        detector.StopDripEspresso();
     }
 
     void ToggleHover(bool toggle)
     {
-        if (toggle)
+        if (!toggle)
         {
             foreach (Collider collider in transform.GetComponentsInChildren<Collider>()) {
                 collider.gameObject.AddComponent<IgnoreHovering>();
