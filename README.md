@@ -24,11 +24,11 @@ Currently, the game is little more than a tech demo. I've been working on and of
 - Steaming milk: Place the steam wand inside a (filled) milk pitcher and twist the valve on the machine. 
     - The steam wand will turn on and begin to steam the milk, raising the temperature (as displayed on the screen).
 - Pump syrup: Syrup bottles with pumps can be pressed to pump out syrup.
+- An ingredient system, allowing the drinks to track what ingredients they contain (how much milk, espresso, syrup, etc.)
 
 # Immediate roadmap
 Coming up, I intend to implement the following features:
 
-- An ingredient system, allowing the drinks to track what ingredients they contain (how much milk, espresso, syrup, etc.)
 - A drink system, with thresholds for appropriate amounts and ratios of ingredients for different drinks
 - Make the environment into an actual coffee shop instead of just a counter with the default skybox
 
