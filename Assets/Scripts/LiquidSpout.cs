@@ -89,7 +89,7 @@ public class LiquidSpout : MonoBehaviour
     void PourLiquid(int drops = -1, float modifier = -1, float angle = -1, float force_modifier = 1) {
         List<Ingredient> ingredients = new List<Ingredient>() { this.ingredient };
         LiquidSpout.PourLiquid(transform.position, 
-                               transform.up.normalized * pourForceMultipilier * (modifier + 0.5f),
+                               transform.up.normalized,
                                ingredients, dropColour, liquidTemperature, minDropsPerFrame, 
                                maxDropsPerFrame, dropPrefab, dropPositionOffset,dropMinScaleMultiplier, 
                                dropMaxScaleMultiplier, pourForceMultipilier, drops, modifier, angle);
