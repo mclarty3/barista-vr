@@ -110,7 +110,12 @@ public class LiquidSpout : MonoBehaviour
 
         for (int i = 0; i < drops; i++) {
             // Designed to iterate equally over all ingredients
-            Ingredient ingredient = ingredients[i % ingredients.Count];
+            Ingredient ingredient = new Ingredient(Ingredient.IngredientType.Undefined);
+            try {
+                ingredient = ingredients[i % ingredients.Count];
+            } catch (System.DivideByZeroException) {
+                Debug.Log("No ingredients in liquid. Did you artifically raise the liquid level?");
+            }
             ingredient.temperature = temperature;
             GameObject oneSpill = Instantiate(dropPrefab);
             oneSpill.transform.position = pourPoint + Random.insideUnitSphere * dropPositionOffset;

@@ -65,18 +65,23 @@ public class ImprovedLiquid : MonoBehaviour
             Vector3 liquidPos = transform.position;
             liquidPos.y = lv.liquidSurfaceYPosition;
             liquidSurfaceCollider.transform.position = liquidPos;
+            liquidSurfaceCollider.transform.rotation = Quaternion.Euler(
+                0, liquidSurfaceCollider.transform.rotation.eulerAngles.y, 0);
         }
         if (SHOWINGREDIENTS) {
-            ShowIngredients();
+            DebugIngredients();
             SHOWINGREDIENTS = false;
         }
     }
 
-    void ShowIngredients() 
+    void DebugIngredients() 
     {
+        string ingredients = "";
         foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
-            Debug.Log(kvp.Key.ingredientType + ": " + kvp.Value);
+            ingredients += kvp.Key.ingredientType + ": " + kvp.Value + " | ";
         }
+        Debug.Log(ingredients);
+        Debug.Log(temperature + "°F");
     }
 
     void FixedUpdate()
@@ -89,7 +94,19 @@ public class ImprovedLiquid : MonoBehaviour
                                                           transform.up).normalized;
             NewPour(spillPos + offsetVector * pourPositionOffset, spillAmount);
         }
+    }
 
+    public void ChangeIngredient(Ingredient ingredient, Ingredient newIngredient)
+    {
+        foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
+            if (kvp.Key.ingredientType == ingredient.ingredientType) {
+                float amount = kvp.Value;
+                amounts.Remove(kvp.Key);
+                amounts.Add(newIngredient, amount);
+                return;
+            }
+        }
+        Debug.Log("The ingredient " + ingredient.ingredientType + " was not found.");
     }
     
     private void NewPour(Vector3 spillPos, float spillAmount)
@@ -159,5 +176,11 @@ public class ImprovedLiquid : MonoBehaviour
     public float GetLevelFromDrops(int numDrops = 1)
     {
         return GetVolumeFromDrops(numDrops) / meshVolume;
+    }
+
+    public void SetMilkSteamed(bool milkSteamed)
+    {
+        ChangeIngredient(new Ingredient(Ingredient.IngredientType.Milk), 
+                         new Ingredient(Ingredient.IngredientType.SteamedMilk));
     }
 }
