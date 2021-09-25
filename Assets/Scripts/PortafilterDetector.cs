@@ -49,8 +49,10 @@ public class PortafilterDetector : MonoBehaviour
     void Update()
     {
         if (portafilterAttached != PortafilterPos.None) {
-            portafilter.transform.position = portafilterPos.position;
-            portafilter.transform.rotation = portafilterPos.rotation;
+            // portafilter.transform.position = portafilterPos.position;
+            // portafilter.transform.rotation = portafilterPos.rotation;
+            // portafilter.transform.rotation
+            portafilter.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         }
     }
 
@@ -70,6 +72,10 @@ public class PortafilterDetector : MonoBehaviour
         }
     }
 
+    // TODO:
+    // Portafilter liquid not registering as espresso
+    // Espresso machine can drip espresso even if portafilter has no grounds
+
     void OnTriggerExit(Collider other)
     {
         portafilterHighlight.SetActive(false);
@@ -81,6 +87,8 @@ public class PortafilterDetector : MonoBehaviour
         portafilter = obj.transform.parent.gameObject.GetComponent<Portafilter>();
         portafilter.detector = this;
         portafilterHighlight.SetActive(false);
+        portafilter.transform.position = portafilterPos.position;
+        portafilter.transform.rotation = portafilterPos.rotation;
 
         if (detectorType == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "Press button\n\nto drip espresso";
@@ -91,6 +99,7 @@ public class PortafilterDetector : MonoBehaviour
 
     void Detach(GameObject obj)
     {
+        portafilter.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         if (detectorType == PortafilterPos.EspressoMachine) {
             espressoMachineText.text = "No portafilter";
             espressoMachineAudioSource.clip = portafilterDetachSound;
@@ -117,7 +126,8 @@ public class PortafilterDetector : MonoBehaviour
 
     public void TryDripEspresso()
     {
-        if (portafilter != null && portafilter.detector.detectorType == PortafilterPos.EspressoMachine)
+        if (portafilter != null && portafilter.detector.detectorType == PortafilterPos.EspressoMachine &&
+            portafilter.espressoStatus == Portafilter.EspressoStatus.Fresh)
         {
             espressoMachineAudioSource.volume = 1;
             espressoMachineAudioSource.clip = espressoDripSound;
