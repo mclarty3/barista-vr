@@ -124,7 +124,7 @@ public class ImprovedLiquid : MonoBehaviour
     private void NewPour(Vector3 spillPos, float spillAmount)
     {
         int drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, spillAmount * 1.6f));
-        LiquidSpout.PourLiquid(spillPos, -(spillPos - transform.position), 
+        LiquidSpout.PourLiquid(spillPos, spillPos - transform.position,
                                new List<Ingredient>(amounts.Keys), lv.liquidColor1, temperature, 1, 25, 
                                liquidDropPrefab, 0.05f, 0.25f, 1.25f, pourForceModifier, drops);
         if (!infiniteLiquid)

@@ -9,6 +9,7 @@ public class LiquidSpout : MonoBehaviour
     public Color dropColour;
     public float liquidTemperature = 0.0f;
     public bool angleDependent = true;
+    public float angleThreshold = 90f;
     public bool active = false;
     public int drops = 10;
     public int dropsPerSecond = -1;
@@ -57,7 +58,7 @@ public class LiquidSpout : MonoBehaviour
     {
         if (angleDependent) {
             float angle = Vector3.Angle(Vector3.up, liquidOutVect);
-            if (angle > 90) {
+            if (angle > angleThreshold) {
                 PourLiquid(angle: angle, randomForce: randomDropForce);
             }
         } else if (active) {
@@ -65,14 +66,14 @@ public class LiquidSpout : MonoBehaviour
                 PourLiquid(drops, randomForce: randomDropForce);
             } else {
                 if (Time.time - lastDropTime > (1.0f / dropsPerSecond)) {
-                    PourLiquid(randomForce: randomDropForce);
+                    PourLiquid(drops: 1, randomForce: randomDropForce);
                     lastDropTime = Time.time;
                 }
             }
         }
     }
 
-    void PourLiquid(int drops = 1, float modifier = -1, float angle = -1, float force_modifier = 1,
+    void PourLiquid(int drops = -1, float modifier = -1, float angle = -1, float force_modifier = 1,
                     bool randomForce = true) {
         List<Ingredient> ingredients = new List<Ingredient>() { this.ingredient };
         LiquidSpout.PourLiquid(transform.position, 
@@ -80,7 +81,7 @@ public class LiquidSpout : MonoBehaviour
                                ingredients, dropColour, liquidTemperature, minDropsPerFrame, 
                                maxDropsPerFrame, dropPrefab, dropPositionOffset,dropMinScaleMultiplier, 
                                dropMaxScaleMultiplier, pourForceMultipilier, drops, 
-                               modifier, angle, randomForce);
+                               modifier, angle, angleThreshold, randomForce);
     }
 
     public static void PourLiquid(Vector3 pourPoint, Vector3 pourDirection, List<Ingredient> ingredients,
@@ -88,14 +89,15 @@ public class LiquidSpout : MonoBehaviour
                                   float maxDropsPerFrame, GameObject dropPrefab, 
                                   float dropPositionOffset,float dropMinScaleMultiplier, 
                                   float dropMaxScaleMultiplier,float pourForceMultipilier, 
-                                  int drops=-1, float modifier=-1, float angle=-1,
-                                  bool randomForce = true) {
+                                  int drops=-1, float modifier=-1, float angle=-1, 
+                                  float angleThreshold=90, bool randomForce = true) {
+        if (modifier == -1) {
+            modifier = angle == -1 ? Random.value : (angle - angleThreshold) / (180 - angleThreshold);
+        }
         if (drops == -1) {
-            if (modifier == -1) {
-                modifier = angle == -1 ? Random.value : (angle / 90) - 1;
-            }
             drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, modifier));
         }
+        Debug.Log(drops + " this frame");
 
         for (int i = 0; i < drops; i++) {
             // Designed to iterate equally over all ingredients
