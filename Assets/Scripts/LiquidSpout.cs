@@ -63,10 +63,10 @@ public class LiquidSpout : MonoBehaviour
             }
         } else if (active) {
             if (dropsPerSecond == -1) {
-                PourLiquid(drops, randomForce: randomDropForce);
+                PourLiquid(drops, modifier: 1, randomForce: randomDropForce);
             } else {
                 if (Time.time - lastDropTime > (1.0f / dropsPerSecond)) {
-                    PourLiquid(drops: 1, randomForce: randomDropForce);
+                    PourLiquid(drops: 1, modifier: 1, randomForce: randomDropForce);
                     lastDropTime = Time.time;
                 }
             }

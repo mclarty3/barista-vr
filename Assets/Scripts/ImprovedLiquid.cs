@@ -14,6 +14,7 @@ public class ImprovedLiquid : MonoBehaviour
     public int maxDropsPerFrame = 15;
     public float pourPositionOffset = 0.05f;
     public float pourForceModifier = 1.5f;
+    public float liquidScatter = 1f;
     public GameObject liquidSurfaceCollider;
     public float temperature;
     public bool SHOWINGREDIENTS = false;
@@ -126,7 +127,8 @@ public class ImprovedLiquid : MonoBehaviour
         int drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, spillAmount * 1.6f));
         LiquidSpout.PourLiquid(spillPos, spillPos - transform.position,
                                new List<Ingredient>(amounts.Keys), lv.liquidColor1, temperature, 1, 25, 
-                               liquidDropPrefab, 0.05f, 0.25f, 1.25f, pourForceModifier, drops);
+                               liquidDropPrefab, 0.05f * liquidScatter, 0.25f, 1.25f, pourForceModifier, 
+                               drops: drops, randomForce: false);
         if (!infiniteLiquid)
         {
             float lostLevel = GetLevelFromDrops(drops);
