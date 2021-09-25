@@ -5,9 +5,13 @@ using UnityEngine.UI;
 
 public class MilkSteaming : MonoBehaviour
 {
-    public bool touchingMilk = false;
-    public bool steamWandOn = false;
-    public ImprovedLiquid milk;
+    [Tooltip("How quickly the steam wand will heat the milk, in Farenheit")]
+    public float degreesPerSecond = 4f;
+    public bool toggleSteamWand = false;
+    private bool touchingMilk = false;
+    private bool steamWandOn = false;
+    private bool steamedMilk = false;
+    public ImprovedLiquid milk = null;
     public Transform steamWandBottom;
     public Transform steamWandTop;
     public AudioSource audioSource;
@@ -21,30 +25,46 @@ public class MilkSteaming : MonoBehaviour
 
     private Vector3 milkSurfaceColliderPos;
 
+    System.Func<string> GetMilkTempText;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        GetMilkTempText = () => System.Math.Round(milk.temperature, 1).ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (milk.lv.liquidSurfaceYPosition > steamWandBottom.position.y && 
-            milk.lv.liquidSurfaceYPosition < steamWandTop.position.y && 
-            Mathf.Abs(steamWandBottom.position.x - milk.lv.transform.position.x) <= 0.04f && 
-            Mathf.Abs(steamWandBottom.position.z - milk.lv.transform.position.z) <= 0.04f)
+        if (toggleSteamWand)
         {
-            if (!touchingMilk) {
-                SetTouchingMilk(true);
+            SetSteamWandOn(!steamWandOn);
+            toggleSteamWand = false;
+        }
+
+        if (steamWandOn && milk != null) {
+            milk.temperature += degreesPerSecond * Time.deltaTime;
+            milkStatusText.text = "Steaming\n\nMilk temp\n\n" + GetMilkTempText() + "°F";
+
+            if (milk.temperature >= 125 && !steamedMilk)
+            {
+                milk.SetMilkSteamed(true);
+                steamedMilk = true;
             }
         }
-        else 
-        {
-            if (touchingMilk) {
-                SetTouchingMilk(false);
-            }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "LiquidSurface") {
+            SetTouchingMilk(true, other.gameObject);
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.name == "LiquidSurface") {
+            SetTouchingMilk(false);
         }
     }
 
@@ -61,9 +81,7 @@ public class MilkSteaming : MonoBehaviour
                 audioSource.Play();
                 milkStatusText.text = "Steaming...\n\nNo milk\n\n";
             } else {
-                // Play milk steam wand sound
-                milkStatusText.text = "Steaming\n\nMilk temp\n\n145°F";
-                StartCoroutine("PlayMilkSteamWandSound");
+                SteamMilk();
             }
             steamParticles.Play();
         } else {
@@ -76,43 +94,64 @@ public class MilkSteaming : MonoBehaviour
                 milkStatusText.text = "No milk";
             } else {
                 // Play milk steam wand off sound
-                audioSource.Stop();
-                audioSource.clip = touchingMilkEndSound;
-                audioSource.loop = false;
-                audioSource.Play();
-                milkStatusText.text = "Milk temp\n\n145°F";
+                StopSteamMilk(false);
             }
             
             steamParticles.Stop();
         }
     }
 
-    public void SetTouchingMilk(bool touching)
+    public void SetTouchingMilk(bool touching, GameObject liquidSurface = null)
     {
-        touchingMilk = touching;
-
-        
+        Debug.Log("SetTouchingMilk(" + touching + ")");
+        if (touching && liquidSurface != null &&
+            liquidSurface.transform.parent.TryGetComponent<ImprovedLiquid>(out milk)) 
+        {
+            touchingMilk = true;
+            if (milk.temperature >= 125) {
+                steamedMilk = true;
+            }
+        } else {
+            touchingMilk = false;
+            milk = null;
+            steamedMilk = false;
+        }
 
         if (steamWandOn) {
             if (touchingMilk) {
-                // Play milk steam wand sound
-                milkStatusText.text = "Steaming...\n\nMilk temp\n\n145°F";
-                StartCoroutine("PlayMilkSteamWandSound");
+                SteamMilk();
             } else {
-                // Play empty steam wand sound
-                audioSource.Stop();
-                audioSource.clip = noMilkSoundLoop;
-                audioSource.loop = true;
-                audioSource.Play();
-                milkStatusText.text = "Steaming...\n\nNo milk";
+                StopSteamMilk(true);
             }
-        }
-        else {
-            if (touching) {
-                milkStatusText.text = "Milk temp\n\n145°F";
+        } else {
+            if (touchingMilk) {
+                milkStatusText.text = "Milk temp\n\n" + GetMilkTempText() + "°F";
             } else {
                 milkStatusText.text = "No milk";
             }
+        }
+    }
+
+    void SteamMilk() 
+    {
+        milkStatusText.text = "Steaming\n\nMilk temp\n\n" + GetMilkTempText() + "°F";
+        StartCoroutine("PlayMilkSteamWandSound");
+    }
+
+    void StopSteamMilk(bool steamWandStillOn)
+    {
+        if (steamWandStillOn) {
+            audioSource.Stop();
+            audioSource.clip = noMilkSoundLoop;
+            audioSource.loop = true;
+            audioSource.Play();
+            milkStatusText.text = "Steaming...\n\nNo milk\n\n";
+        } else {
+            audioSource.Stop();
+            audioSource.clip = touchingMilkEndSound;
+            audioSource.loop = false;
+            audioSource.Play();
+            milkStatusText.text = "Milk temp\n\n" + GetMilkTempText() + "°F";
         }
     }
 

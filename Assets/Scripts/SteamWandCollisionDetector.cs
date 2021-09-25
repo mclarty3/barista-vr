@@ -6,9 +6,6 @@ public class SteamWandCollisionDetector : MonoBehaviour
 {
 
     public MilkSteaming steamWand;
-    public Transform steamWandBottom;
-    public Transform steamWandTop;
-    private bool touching = false;
 
     // Start is called before the first frame update
     void Start()
@@ -19,35 +16,19 @@ public class SteamWandCollisionDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.position.y > steamWandBottom.position.y && 
-            transform.position.y < steamWandTop.position.y)
-        {
-            if (!touching) {
-                steamWand.SetTouchingMilk(true);
-            }
-        }
-        else 
-        {
-            if (touching) {
-                steamWand.SetTouchingMilk(false);
-            }
-        }
     }
 
-
-    /*void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "SteamWand")
-        {
-            steamWand.SetTouchingMilk(true);
+        if (other.gameObject.name == "LiquidSurface") {
+            steamWand.SetTouchingMilk(true, other.gameObject);
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.tag == "SteamWand")
-        {
+        if (other.gameObject.name == "LiquidSurface") {
             steamWand.SetTouchingMilk(false);
         }
-    }*/
+    }
 }
