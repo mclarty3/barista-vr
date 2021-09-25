@@ -96,6 +96,18 @@ public class ImprovedLiquid : MonoBehaviour
         }
     }
 
+    bool ContainsIngredient(Ingredient.IngredientType ingredientType, out Ingredient ingredient)
+    {
+        foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
+            if (kvp.Key.ingredientType == ingredientType) {
+                ingredient = kvp.Key;
+                return true;
+            }
+        }
+        ingredient = null;
+        return false;
+    }
+
     public void ChangeIngredient(Ingredient ingredient, Ingredient newIngredient)
     {
         foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
@@ -142,8 +154,8 @@ public class ImprovedLiquid : MonoBehaviour
     {
         if (amount <= 0) return;
 
-        if (amounts.ContainsKey(ingredient)) {
-            amounts[ingredient] += amount;
+        if (ContainsIngredient(ingredient.ingredientType, out Ingredient existingIngredient)) {
+            amounts[existingIngredient] += amount;
         } else {
             amounts.Add(ingredient, amount);
         }
