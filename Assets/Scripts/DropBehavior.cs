@@ -47,16 +47,17 @@ public class DropBehavior : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        if (other.collider.gameObject.tag != "LiquidCatcher") {
-            Destroy(gameObject);
-            // Debug.Log("Destroyed. Collided with " + other.collider.gameObject.name);
-        }
-        else {
-            Debug.Log("Adding liquid for 1 drop");
-            Destroy(gameObject);
-            LiquidCatcher temp;
-            if (other.collider.gameObject.TryGetComponent<LiquidCatcher>(out temp))
+        GameObject otherObj = other.collider.gameObject;
+        LiquidCatcher temp;
+        if (otherObj.tag == "LiquidCatcher") {
+            if (otherObj.TryGetComponent<LiquidCatcher>(out temp))
+                temp.OnCatchLiquid(this);
+        } else if (otherObj.transform.parent != null && 
+                   otherObj.transform.parent.parent != null &&
+                   otherObj.transform.parent.parent.tag == "LiquidCatcher") {
+            if (otherObj.transform.parent.parent.TryGetComponent<LiquidCatcher>(out temp))
                 temp.OnCatchLiquid(this);
         }
+        Destroy(gameObject);
     }
 }
