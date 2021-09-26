@@ -34,6 +34,7 @@ public class LiquidSpout : MonoBehaviour
     private Vector3 liquidOutVect;
     private float lastDropTime;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -112,7 +113,12 @@ public class LiquidSpout : MonoBehaviour
             oneSpill.transform.position = pourPoint + Random.insideUnitSphere * dropPositionOffset;
             oneSpill.transform.localScale *= Random.Range(dropMinScaleMultiplier, 
                                                           dropMaxScaleMultiplier);
-            oneSpill.GetComponent<Renderer>().material.color = color;
+            MaterialPropertyBlock props = new MaterialPropertyBlock();
+            MeshRenderer renderer = oneSpill.GetComponent<MeshRenderer>();
+            props.SetColor("_Color", color);
+            renderer.SetPropertyBlock(props);
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
             Vector3 force = randomForce ? new Vector3(Random.value - 0.5f, 
                                         Random.value * 0.1f - 0.2f, 
                                         Random.value - 0.5f) : Vector3.zero;
