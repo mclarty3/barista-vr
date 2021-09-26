@@ -9,6 +9,7 @@ TagManager:
   - projectile
   - FxTemporaire
   - SteamWand
+  - Cup
   layers:
   - Default
   - TransparentFX
