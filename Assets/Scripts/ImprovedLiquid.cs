@@ -18,6 +18,7 @@ public class ImprovedLiquid : MonoBehaviour
     public GameObject liquidSurfaceCollider;
     public float temperature;
     public bool SHOWINGREDIENTS = false;
+    public bool QUERYBEVERAGETYPE = false;
     
     public LiquidVolume lv;
     public bool infiniteLiquid = false;
@@ -73,6 +74,13 @@ public class ImprovedLiquid : MonoBehaviour
             DebugIngredients();
             SHOWINGREDIENTS = false;
         }
+        if (QUERYBEVERAGETYPE) {
+            Beverage beverage = Beverage.IdentifyBeverage(this);
+            if (beverage != null) {
+                beverage.GetBeverageScore(this, debug: true);
+            }
+            QUERYBEVERAGETYPE = false;
+        }
     }
 
     void DebugIngredients() 
@@ -121,6 +129,17 @@ public class ImprovedLiquid : MonoBehaviour
         }
         Debug.Log("The ingredient " + ingredient.ingredientType + " was not found.");
     }
+
+    public float GetIngredientRatio(Ingredient.IngredientType ingredientType)
+    {
+        float total = lv.level;
+        foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
+            if (kvp.Key.ingredientType == ingredientType) {
+                return kvp.Value / total;
+            }
+        }
+        return 0;
+    }
     
     private void NewPour(Vector3 spillPos, float spillAmount)
     {
@@ -139,6 +158,8 @@ public class ImprovedLiquid : MonoBehaviour
                 float amount = ingredientAmount.Value - lostPerIngredient;
                 if (amount >= 0.05f) {
                     temp.Add(ingredientAmount.Key, amount);
+                } else {
+                    lv.level -= ingredientAmount.Value;
                 }
             }
             amounts = temp;

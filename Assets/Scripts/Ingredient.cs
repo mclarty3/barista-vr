@@ -6,6 +6,7 @@ using UnityEngine;
 public class Ingredient
 {
 
+
     [System.Serializable]
     public enum IngredientType
     {
@@ -21,6 +22,8 @@ public class Ingredient
         CinnamonSyrup,
         PeppermintSyrup
     }
+
+    public static int[] syrupIndices = {4, 6};
 
     public Color32[] ingredientColors = new Color32[]
     {
