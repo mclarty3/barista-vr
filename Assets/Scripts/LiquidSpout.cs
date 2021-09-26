@@ -98,7 +98,6 @@ public class LiquidSpout : MonoBehaviour
         if (drops == -1) {
             drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, modifier));
         }
-        Debug.Log(drops + " this frame");
 
         for (int i = 0; i < drops; i++) {
             // Designed to iterate equally over all ingredients

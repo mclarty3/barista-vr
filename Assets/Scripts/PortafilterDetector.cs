@@ -141,6 +141,6 @@ public class PortafilterDetector : MonoBehaviour
     public void StopDripEspresso()
     {
         espressoMachineAudioSource.volume = 0.5f;
-        espressoMachineText.text = "Please remove portafilter";
+        espressoMachineText.text = "Please remove\n\nportafilter";
     }
 }
