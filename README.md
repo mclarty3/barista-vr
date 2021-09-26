@@ -25,14 +25,14 @@ Currently, the game is little more than a tech demo. I've been working on and of
     - The steam wand will turn on and begin to steam the milk, raising the temperature (as displayed on the screen).
 - Pump syrup: Syrup bottles with pumps can be pressed to pump out syrup.
 - An ingredient system, allowing the drinks to track what ingredients they contain (how much milk, espresso, syrup, etc.)
+- A drink system, with thresholds for appropriate amounts and ratios of ingredients for different drinks
+- A new and improved coffee shop environment! Now with a primitive outside visible through the storefront windows and open door
 
 # Immediate roadmap
-Coming up, I intend to implement the following features:
 
-- A drink system, with thresholds for appropriate amounts and ratios of ingredients for different drinks
-- Make the environment into an actual coffee shop instead of just a counter with the default skybox
+Coming up next, I'm working on polishing up the fundamentals and creating a basic gameplay loop for the first alpha release! It's actually coming quite a bit more quickly than I expected (certainly not due to many nights staying up far past my bedtime), so I'm expecting to release it probably the first week of October.
 
-If I work on this consistently enough, I can see these changes being done by the end of the month. Finger's crossed for a playable coffee making sandbox demo sometime in October.
+I'm realizing I also likely have quite a bit of figuring out to do to get this to work on Quest... The whole VR interaction system is based on the SteamVR Unity asset, and I fear the port will not be trivial. Fingers crossed!
 
 # Further down the line
 As far as goals for how the game will play once the foundation is in place:
