@@ -1,5 +1,5 @@
-﻿//#define LIQUID_VOLUME_SCATTERING
-//#define LIQUID_VOLUME_SMOKE
+﻿#define LIQUID_VOLUME_SCATTERING
+#define LIQUID_VOLUME_SMOKE
 #define LIQUID_VOLUME_FP_RENDER_TEXTURES
 
 		struct Input {
@@ -8,20 +8,21 @@
 			#if LIQUID_VOLUME_DEPTH_AWARE || LIQUID_VOLUME_DEPTH_AWARE_PASS || LIQUID_VOLUME_IRREGULAR
 			float4 screenPos;
 			#endif
+			float3 camPos;
 		};
 
 		sampler2D _NoiseTex2D;
 		#if LIQUID_VOLUME_DEPTH_AWARE
-		sampler2D _CameraDepthTexture;
-        float _DepthAwareOffset;
+			UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+			float _DepthAwareOffset;
 		#endif
 
 		#if LIQUID_VOLUME_DEPTH_AWARE_PASS
-		sampler2D _VLFrontBufferTexture;
+			sampler2D _VLFrontBufferTexture;
 		#endif
 		
 		#if LIQUID_VOLUME_IRREGULAR
-		sampler2D _VLBackBufferTexture;
+			sampler2D _VLBackBufferTexture;
 		#endif
 		
 		fixed4 _Color1;
@@ -151,9 +152,12 @@
 			o.vertex.xz *= 0.1.xx * _Turbulence.xx;	// extracted from frag
 			o.vertex.xz += _Time.xx;
 			v.vertex.xyz *= _FlaskThickness;
-			o.realPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+			o.realPos = mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0)).xyz;
 	        #if LIQUID_VOLUME_IGNORE_GRAVITY
-   			o.realPos = mul((float3x3)_Rot, o.realPos - _Center) + _Center;
+   				o.realPos = mul((float3x3)_Rot, o.realPos - _Center) + _Center;
+				o.camPos = mul((float3x3)_Rot, _WorldSpaceCameraPos - _Center) + _Center;
+			#else
+				o.camPos = _WorldSpaceCameraPos;
    			#endif
 		}
 		
@@ -174,22 +178,18 @@
 		void surf (Input IN, inout SurfaceOutput o) {
 	        if (IN.vertex.y > _UpperLimit || IN.vertex.y < _LowerLimit) return;
 
-	        #if LIQUID_VOLUME_IGNORE_GRAVITY
-   			    wsCameraPos = mul((float3x3)_Rot, _WorldSpaceCameraPos - _Center) + _Center;
-			#else
-			    wsCameraPos = _WorldSpaceCameraPos;
-   			#endif
+			wsCameraPos = IN.camPos; // _WorldSpaceCameraPos is wrong in XR in fragment shader of a surface shader due to a Unity bug (we pass it from the vertex shader where the stereo eye index is set correctly)
 
 			float t0, t1;
 			float3 rd = IN.realPos - wsCameraPos;
 			float dist = length(rd);
 			rd /= dist;
 			#if LIQUID_VOLUME_SPHERE
-			intSphere(rd, t0, t1);
+				intSphere(rd, t0, t1);
 			#elif LIQUID_VOLUME_CUBE
-			intBox(rd, t0, t1);			
+				intBox(rd, t0, t1);			
 			#elif LIQUID_VOLUME_CYLINDER
-			intCylinder(rd, t0, t1);
+				intCylinder(rd, t0, t1);
 			#else
 			t0 = dist;
 			t1 = dist + _Size.x;

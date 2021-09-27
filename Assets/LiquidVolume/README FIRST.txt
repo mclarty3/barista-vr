@@ -33,6 +33,9 @@ Version history
 ---------------
 
 
+Version 4.6.2
+- [Fix] VR multiview fix for Oculus Quest 2
+
 Version 4.6
 - Irregular topology: back faces are now computed per liquid volume instance to support multiple/overlapping instances
 - Improved volume computation for maintaining surface position when flask is rotated (rotationLevelBias option)
