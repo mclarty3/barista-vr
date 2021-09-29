@@ -35,10 +35,12 @@ public class ImprovedLiquid : MonoBehaviour
     public bool QUERYBEVERAGETYPE = false;
     public bool useNewPouringSystem = false;
     
-    private LiquidVolume lv;
+    public Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
+    [System.NonSerialized]
+    public LiquidVolume lv;
+    
     private float meshVolume;
     private float referenceVolume;
-    private Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
     private ParticleManager particleManager = null;
     private GameManager gameManager;
 
