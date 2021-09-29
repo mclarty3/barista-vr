@@ -11,7 +11,7 @@
 
 		sampler2D _VLGrabBlurTexture;
 		#if LIQUID_VOLUME_DEPTH_AWARE
-		sampler2D _CameraDepthTexture;
+			UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 		#endif
 		float4 _VLGrabBlurTexture_TexelSize;
 		float _FlaskBlurIntensity;

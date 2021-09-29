@@ -23,7 +23,7 @@
 			o.vertex.xz *= 0.1.xx * _Turbulence.xx;
 			o.vertex.xz += _Time.xx;
 			v.vertex.xyz *= _FlaskThickness;
-           	o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+           	o.worldPos = mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0)).xyz;
            	TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
     		return o;
 		}
