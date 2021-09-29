@@ -5,19 +5,8 @@ using UnityEngine;
 public class ParticleManager : MonoBehaviour
 {
     public ParticleSystem particles;
-    public bool isPouring { 
-        get { return _isPouring;} 
-        set { 
-            Debug.Log("setting...");
-            _isPouring = value;
-            var em = particles.emission;
-            em.rateOverTime = value ? 2500 : 0;
-            Debug.Log(em.rateOverTime);
-        }
-    }
-    [SerializeField]
-    public bool _isPouring = false;
-
+    public int particleFlowRate = 2500;
+    public bool isPouring = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,8 +16,32 @@ public class ParticleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ParticleSystem.ShapeModule shape = particles.shape;
-        shape.position = transform.position - particles.transform.position;
-        shape.rotation = transform.rotation.eulerAngles - particles.transform.rotation.eulerAngles;
+        // ParticleSystem.ShapeModule shape = particles.shape;
+        // // Debug.Log(transform.position.ToString() + " " + particles.transform.position.ToString() + " " + (transform.position - particles.transform.position).ToString());
+        // shape.position = transform.position - particles.transform.position;
+        // shape.rotation = (Quaternion.Inverse(particles.transform.rotation) * transform.rotation).eulerAngles;
+    }
+
+    public void StartPouring()
+    {
+        float start = Time.time;
+        StartCoroutine(Pour(start));
+    }
+
+    IEnumerator Pour(float start)
+    {
+        yield return new WaitForSeconds(0.001f);
+        isPouring = true;
+        var em = particles.emission;
+        em.rateOverTime = particleFlowRate;
+        int drops = (int)(particleFlowRate * (Time.time - start));
+        transform.parent.GetComponentInChildren<ImprovedLiquid>().ReduceLiquid(drops);
+    }
+
+    public void StopPouring()
+    {
+        isPouring = false;
+        var em = particles.emission;
+        em.rateOverTime = 0;
     }
 }

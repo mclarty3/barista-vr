@@ -6,33 +6,41 @@ using LiquidVolumeFX;
 
 public class ImprovedLiquid : MonoBehaviour
 {
-    [Tooltip("Set the ingredient if the container will contain liquid on scene start")]
-    [SerializeField]
-    public Ingredient.IngredientType ingredientType = Ingredient.IngredientType.Undefined;
+    [Header("Old drop stuff")]
     public GameObject liquidDropPrefab;
     public int minDropsPerFrame = 5;
     public int maxDropsPerFrame = 15;
-    public float pourPositionOffset = 0.05f;
     public float pourForceModifier = 1.5f;
     public float liquidScatter = 1f;
+    [Header("Pour settings")]
+    [Tooltip("The minimum number of drops (particles) that will be emitted per frame when pouring")]
+    public int _minDropsPerFrame = 100;
+    [Tooltip("The maximum number of drops (particles) that will be emitted per frame when pouring")]
+    public int _maxDropsPerFrame = 10000;
+    [Tooltip("The ratio between drops spilled and ounces of liquid stored in the container")]
+    public int dropsPerOz = 50;
+    [Tooltip("Determines how far from the pour point the liquid pours, parallel to container up/down")]
+    public float pourVerticalOffset = 0.05f;
+    [Tooltip("Determines how far from the pour point the liquid pours, parallel to container forward")]
+    public float pourHorizontalOffset = 0.05f;
+    [Tooltip("The surface collider for the milk pitcher, to detect collision with the steam wand")]
     public GameObject liquidSurfaceCollider;
+    [Header("Beverage debugging")]
+    [Tooltip("Set the ingredient if the container will contain liquid on scene start")]
+    public bool infiniteLiquid = false;
+    [SerializeField]
+    public Ingredient.IngredientType ingredientType = Ingredient.IngredientType.Undefined;
     public float temperature;
     public bool SHOWINGREDIENTS = false;
     public bool QUERYBEVERAGETYPE = false;
+    public bool useNewPouringSystem = false;
     
-    public LiquidVolume lv;
-    public bool infiniteLiquid = false;
-
-    private Vector3 spillPoint;
-    public float meshVolume;
-    private Dictionary<Color, float> colorRatio = new Dictionary<Color, float>();
-
-    [SerializeField]
-    public Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
-    private GameManager gameManager;
+    private LiquidVolume lv;
+    private float meshVolume;
     private float referenceVolume;
-    private int numOzInReferenceVolume = 20;
-    public int dropsPerOz = 50;
+    private Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
+    private ParticleManager particleManager = null;
+    private GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
@@ -54,9 +62,15 @@ public class ImprovedLiquid : MonoBehaviour
             gameManager.referenceLiquidVolume.gameObject.transform);
         meshVolume = GetMeshVolume.VolumeOfMesh(lv.gameObject.GetComponent<MeshFilter>().sharedMesh, 
                                                 lv.gameObject.transform);
-        Debug.Log(transform.parent.name + " has " + meshVolume + " volume and " + 
-                  GetVolumeInOz(meshVolume) + " oz with " + 
-                  GetVolumeInOz(GetVolumeFilled()) + " oz filled");
+        // Debug.Log(transform.parent.name + " has " + meshVolume + " volume and " + 
+        //           GetVolumeInOz(meshVolume) + " oz with " + 
+        //           GetVolumeInOz(GetVolumeFilled()) + " oz filled");
+
+        particleManager = transform.parent.GetComponentInChildren<ParticleManager>();
+        if (particleManager != null) {
+            minDropsPerFrame = _minDropsPerFrame;
+            maxDropsPerFrame = _maxDropsPerFrame;
+        }
     }
 
     // Update is called once per frame
@@ -98,10 +112,49 @@ public class ImprovedLiquid : MonoBehaviour
         Vector3 spillPos;
         float spillAmount;
         if (lv.GetSpillPoint(out spillPos, out spillAmount)) {
-            Vector3 spillPos_local = transform.InverseTransformPoint(spillPos);
-            Vector3 offsetVector = Vector3.ProjectOnPlane(transform.InverseTransformDirection(spillPos), 
-                                                          transform.up).normalized;
-            NewPour(spillPos + offsetVector * pourPositionOffset, spillAmount);
+                Vector3 spillPos_local = transform.InverseTransformPoint(spillPos);
+                Vector3 offsetVector = Vector3.ProjectOnPlane(spillPos - transform.position,
+                                                            transform.up).normalized;
+                Vector3 finalPos = (spillPos + (offsetVector * pourHorizontalOffset) +
+                                    (transform.up * pourVerticalOffset));
+            if (particleManager == null) {
+                NewPour(finalPos, spillAmount);
+            } else {
+                ParticlePour(finalPos, spillAmount);
+            }
+        } else if (particleManager != null && particleManager.isPouring) {
+            particleManager.StopPouring();
+        }
+    }
+
+    void ParticlePour(Vector3 position, float spillAmount) 
+    {
+        particleManager.particleFlowRate = (int)Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame,
+                                                           spillAmount);
+        particleManager.transform.position = position;
+        Vector3 dir = position - transform.position;
+        particleManager.transform.rotation = Quaternion.LookRotation(dir);
+        particleManager.StartPouring();
+    }
+
+    public void ReduceLiquid(int lostDrops)
+    {
+        if (!infiniteLiquid)
+        {
+            float lostLevel = GetLevelFromDrops(lostDrops);
+            float lostPerIngredient = lostLevel / amounts.Count;
+            Dictionary<Ingredient, float> temp = new Dictionary<Ingredient, float>();
+            foreach (KeyValuePair<Ingredient, float> ingredientAmount in amounts)
+            {
+                float amount = ingredientAmount.Value - lostPerIngredient;
+                if (amount >= 0.05f) {
+                    temp.Add(ingredientAmount.Key, amount);
+                } else {
+                    lv.level -= ingredientAmount.Value;
+                }
+            }
+            amounts = temp;
+            lv.level -= lostLevel;
         }
     }
 
