@@ -41,12 +41,10 @@ namespace Valve.VR.InteractionSystem
             handCollider = ((GameObject)Instantiate(handColliderPrefab.gameObject)).GetComponent<HandCollider>();
             Vector3 localPosition = handCollider.transform.localPosition;
             Quaternion localRotation = handCollider.transform.localRotation;
-            Vector3 scale = handCollider.transform.localScale;
 
             handCollider.transform.parent = Player.instance.transform;
             handCollider.transform.localPosition = localPosition;
             handCollider.transform.localRotation = localRotation;
-            handCollider.transform.localScale = scale;
             handCollider.hand = this;
 
             GetComponent<SteamVR_Behaviour_Pose>().onTransformUpdated.AddListener(UpdateHand);
