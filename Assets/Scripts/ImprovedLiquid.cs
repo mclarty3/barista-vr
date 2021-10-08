@@ -17,8 +17,10 @@ public class ImprovedLiquid : MonoBehaviour
     public int _minDropsPerFrame = 100;
     [Tooltip("The maximum number of drops (particles) that will be emitted per frame when pouring")]
     public int _maxDropsPerFrame = 10000;
-    [Tooltip("The ratio between drops spilled and ounces of liquid stored in the container")]
-    public int dropsPerOz = 50;
+    [Tooltip("How many drops are emitted for each ounce of liquid")]
+    public int pouredDropsPerOz = 300;
+    [Tooltip("How many drops caught by the liquidCatcher correspond to one ounce of liquid")]
+    public int receivedDropsPerOz = 42;
     [Tooltip("Determines how far from the pour point the liquid pours, parallel to container up/down")]
     public float pourVerticalOffset = 0.05f;
     [Tooltip("Determines how far from the pour point the liquid pours, parallel to container forward")]
@@ -43,6 +45,7 @@ public class ImprovedLiquid : MonoBehaviour
     private float referenceVolume;
     private ParticleManager particleManager = null;
     private GameManager gameManager;
+    private bool empty = false;
 
     // Start is called before the first frame update
     void Start()
@@ -97,6 +100,19 @@ public class ImprovedLiquid : MonoBehaviour
             }
             QUERYBEVERAGETYPE = false;
         }
+
+        if (!empty && lv.level <= 0.01f) {
+            empty = true;
+            lv.level = 0;
+            Color c = lv.liquidColor1;
+            Color invis = new Color(c.r, c.g, c.b, 0);
+            lv.liquidColor1 = invis;
+        } else if (empty && lv.level > 0.01f) {
+            empty = false;
+            Color c = lv.liquidColor1;
+            Color vis = new Color(c.r, c.g, c.b, 1);
+            lv.liquidColor1 = vis;
+        }
     }
 
     void DebugIngredients() 
@@ -136,7 +152,7 @@ public class ImprovedLiquid : MonoBehaviour
         particleManager.transform.position = position;
         Vector3 dir = position - transform.position;
         particleManager.transform.rotation = Quaternion.LookRotation(dir);
-        particleManager.StartPouring();
+        particleManager.StartPouring(amounts);
     }
 
     public void ReduceLiquid(int lostDrops)
@@ -228,6 +244,12 @@ public class ImprovedLiquid : MonoBehaviour
         AddLiquid(ingredient, GetLevelFromDrops());
     }
 
+    public void AddDrop(Ingredient ingredient) {
+        float level = GetLevelFromDrops(pourReceive: -1);
+        AddLiquid(ingredient, level);
+        Debug.Log("adding level: " + level);
+    }
+
     public void AddLiquid(Ingredient ingredient, float amount) 
     {
         if (amount <= 0) return;
@@ -258,14 +280,21 @@ public class ImprovedLiquid : MonoBehaviour
         return 20f * volume / referenceVolume;
     }
 
-    public float GetVolumeFromDrops(int numDrops)
+    public float GetVolumeFromDrops(int numDrops, int pourReceive = 1)
     {
-        return (referenceVolume * numDrops) / (20 * dropsPerOz);
+        if (pourReceive == 1) {
+            return (referenceVolume * numDrops) / (20 * pouredDropsPerOz);
+        } else if (pourReceive == -1) {
+            return (referenceVolume * numDrops) / (20 * receivedDropsPerOz);
+        } else {
+            Debug.LogError("Error: pourReceive must be either -1 or 1. Got " + pourReceive);
+            return 0;
+        }
     }
 
-    public float GetLevelFromDrops(int numDrops = 1)
+    public float GetLevelFromDrops(int numDrops = 1, int pourReceive = 1)
     {
-        return GetVolumeFromDrops(numDrops) / meshVolume;
+        return GetVolumeFromDrops(numDrops, pourReceive) / meshVolume;
     }
 
     public void SetMilkSteamed(bool milkSteamed)
