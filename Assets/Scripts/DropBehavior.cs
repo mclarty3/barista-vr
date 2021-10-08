@@ -17,6 +17,7 @@ public class DropBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        ingredient = new Ingredient(Ingredient.IngredientType.Milk);
         dropColor = this.GetComponent<Renderer>().material.color;
         timeCreated = Time.time;
     }

@@ -21,6 +21,24 @@ public class LiquidCatcher : MonoBehaviour
         
     }
 
+    void OnParticleCollision(GameObject other) {
+        ParticleManager particleManager = other.GetComponent<ParticleManager>();
+        ParticleSystem ps = other.GetComponent<ParticleSystem>();
+        List<ParticleCollisionEvent> events = new List<ParticleCollisionEvent>();
+        int numCollisions = ParticlePhysicsExtensions.GetCollisionEvents(ps, gameObject, events);
+        foreach (KeyValuePair<Ingredient, float> ingredient in particleManager.ingredients) {
+            for (int i = 0; i < numCollisions * ingredient.Value; i++) {
+                OnCatchLiquid(ingredient.Key);
+            }
+        }
+    }
+
+    public void OnCatchLiquid(Ingredient ingredient) {
+        if (improvedLiquid != null) {
+            improvedLiquid.AddDrop(ingredient);
+        }
+    }
+
     public void OnCatchLiquid(DropBehavior drop) {
         improvedLiquid.AddDrop(drop);
     }
