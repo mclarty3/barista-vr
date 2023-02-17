@@ -234,11 +234,61 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropPrefab: {fileID: 2351257203509581200, guid: a1b216a942b3d904b8f6dc75437cf747, type: 3}
+  ingredient:
+    ingredientColors:
+    - serializedVersion: 2
+      rgba: 4278190080
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4278195500
+    - serializedVersion: 2
+      rgba: 4281172397
+    - serializedVersion: 2
+      rgba: 4281172397
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4294967295
+    - serializedVersion: 2
+      rgba: 4294967295
+    ingredientTemps:
+    - 0
+    - 36
+    - 145
+    - 160
+    - 65
+    - 65
+    - 65
+    - 65
+    - 65
+    - 65
+    - 65
+    ingredientType: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    temperature: 36
   dropColour: {r: 1, g: 1, b: 1, a: 1}
+  liquidTemperature: 36
   angleDependent: 1
+  angleThreshold: 90
   active: 0
   drops: 10
   dropsPerSecond: -1
+  minDropsPerFrame: 1
+  maxDropsPerFrame: 25
+  dropMinScaleMultiplier: 0.25
+  dropMaxScaleMultiplier: 1.25
+  pourForceMultipilier: 1
+  dropRandomPositionMultiplier: 0.01
+  dropForwardPositionOffset: 0.035
+  dropUpPositionOffset: 0
+  randomDropForceMultiplier: 0
 --- !u!1 &3222870531454964014
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +303,7 @@ GameObject:
   - component: {fileID: 3222870531454964012}
   - component: {fileID: 3222870531454964015}
   m_Layer: 0
-  m_Name: Milk Carton 1
+  m_Name: Milk Carton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

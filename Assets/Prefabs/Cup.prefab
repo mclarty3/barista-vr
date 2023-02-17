@@ -109,7 +109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c28495845b580ae41bf395ac1ab432b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  improvedLiquid: {fileID: 0}
 --- !u!1 &9070364097526926007
 GameObject:
   m_ObjectHideFlags: 0
@@ -11344,6 +11343,14 @@ MonoBehaviour:
   _topology: 1
   _detail: 11
   _level: 0
+  _levelMultiplier: 1
+  _liquidLayers: []
+  _smoothContactSurface: 3
+  _ditherStrength: 0.5
+  _layersAdjustmentSpeed: 1
+  _layersAdjustmentCompact: 1
+  _useLightColor: 0
+  _directionalLight: {fileID: 0}
   _liquidColor1: {r: 0, g: 1, b: 0, a: 0.1}
   _liquidScale1: 1
   _liquidColor2: {r: 1, g: 0, b: 0, a: 0.3}
@@ -11371,14 +11378,18 @@ MonoBehaviour:
   _smokeColor: {r: 0.7, g: 0.7, b: 0.7, a: 0.25}
   _smokeScale: 0.25
   _smokeBaseObscurance: 2
+  _smokeHeightAtten: 0
   _smokeSpeed: 5
   _fixMesh: 0
   originalMesh: {fileID: 0}
   originalPivotOffset: {x: 0, y: 0, z: 0}
   _pivotOffset: {x: 0, y: 0, z: 0}
+  _autoCloseMesh: 0
+  _limitVerticalRange: 0
   _upperLimit: 1.5
   _lowerLimit: -1.5
   _subMeshIndex: 0
+  _flaskColor: {r: 1, g: 1, b: 1, a: 0}
   _flaskTint: {r: 0, g: 0, b: 0, a: 1}
   _flaskThickness: 0.03
   _flaskGlossinessExternal: 0.767
@@ -11392,6 +11403,7 @@ MonoBehaviour:
   _foamRaySteps: 7
   _smokeRaySteps: 5
   _bumpMap: {fileID: 0}
+  _bumpStrength: 1
   _bumpDistortionScale: 1
   _bumpDistortionOffset: {x: 0, y: 0}
   _distortionMap: {fileID: 0}
@@ -11401,9 +11413,12 @@ MonoBehaviour:
   _distortionAmount: 1
   _depthAware: 1
   _depthAwareOffset: 0
+  _irregularDepthDebug: 0
   _depthAwareCustomPass: 0
+  _depthAwareCustomPassDebug: 0
   _doubleSidedBias: 0.001
-  _rotationLevelBias: 0
+  _backDepthBias: 0
+  _rotationLevelCompensation: 0
   _ignoreGravity: 0
   _reactToForces: 0
   _textureAlpha: 1
@@ -11415,7 +11430,104 @@ MonoBehaviour:
   _reflectionTexture: {fileID: 0}
   _physicsMass: 1
   _physicsAngularDamp: 0.02
-  liqMat: {fileID: 0}
+  _bubblesAmount: 32
+  _bubblesSizeMin: 2
+  _bubblesSizeMax: 4
+  _bubblesScale: 3
+  _bubblesBrightness: 1
+  _bubblesVerticalSpeed: 1
+  _bubblesSeed: 1
+  _pointLightsEnabled: 0
+  pointLightParams:
+  - name: Light 1
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  - name: Light 2
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  - name: Light 3
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  - name: Light 4
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  - name: Light 5
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  - name: Light 6
+    targetPos: {x: 0, y: 0, z: 0}
+    randomTarget: 0
+    randomTargetCenter: {x: 0, y: 0, z: 0}
+    randomTargetRadius: 0
+    nextTargetInterval: 0
+    moveSpeed: 0
+    lightRange: 0
+    intensityMin: 0
+    intensityMax: 0
+    intensitySpeed: 0
+    color1: {r: 0, g: 0, b: 0, a: 0}
+    color2: {r: 0, g: 0, b: 0, a: 0}
+    colorSpeed: 0
+  pointLightsScatteringAmount: 0.8
+  pointLightsIntensity: 1
+  pointLightInsideAtten: 0
+  fixedMesh: {fileID: 0}
+  closedMesh: {fileID: 0}
 --- !u!114 &9070364098834332901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11429,9 +11541,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquidDropPrefab: {fileID: 2351257203509581200, guid: a1b216a942b3d904b8f6dc75437cf747, type: 3}
-  numDropsPerSecond: 10
+  minDropsPerFrame: 1
+  maxDropsPerFrame: 40
+  pourForceModifier: 0.15
+  liquidScatter: 0.05
+  _minDropsPerFrame: 100
+  _maxDropsPerFrame: 10000
+  pouredDropsPerOz: 10
+  receivedDropsPerOz: 40
+  pourVerticalOffset: 0.01
+  pourHorizontalOffset: 0.03
   liquidSurfaceCollider: {fileID: 0}
-  lv: {fileID: 0}
+  infiniteLiquid: 0
+  ingredientType: 0
+  temperature: 0
+  SHOWINGREDIENTS: 0
+  QUERYBEVERAGETYPE: 0
+  useNewPouringSystem: 0
 --- !u!1 &9070364098948077833
 GameObject:
   m_ObjectHideFlags: 0
