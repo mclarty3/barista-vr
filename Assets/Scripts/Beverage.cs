@@ -26,7 +26,7 @@ public class Beverage
     {
         Random.InitState(System.DateTime.Now.Millisecond);
         Beverage randomBev = BeverageList.list[Random.Range(0, BeverageList.list.Count)];
-        Beverage beverage = new Beverage(randomBev.name, randomBev.temperature, 
+        Beverage beverage = new Beverage(randomBev.name, randomBev.temperature,
                                          new Dictionary<Ingredient.IngredientType, float>(
                                              randomBev.ingredientAmounts)
                                          );
@@ -111,12 +111,12 @@ public class Beverage
             float error = Mathf.Abs(entry.Value - trueRatio);
             if (error > 0.1) {
                 float addScore = entry.Value * (1 - error + 0.1f);
-                debugString += (entry.Key.ToString() + " " + 
-                                System.Math.Round((1 - error + 0.1f) * 100, 2) + 
+                debugString += (entry.Key.ToString() + " " +
+                                System.Math.Round((1 - error + 0.1f) * 100, 2) +
                                 "%: " + System.Math.Round(addScore * 100, 2) + " pts" + "\n");
                 score += addScore;
             }  else {
-                debugString += (entry.Key.ToString() + " 100%: " + 
+                debugString += (entry.Key.ToString() + " 100%: " +
                                 System.Math.Round(entry.Value * 100, 2) + " pts" + "\n");
                 score += entry.Value;
             }
@@ -127,21 +127,21 @@ public class Beverage
             if (!ingredientAmounts.ContainsKey(entry.Key.ingredientType)) {
                 // Unknown ingredient in beverage
                 score -= entry.Value;
-                debugString += ("Unknown ingredient: -" + System.Math.Round(entry.Value * 100, 2) + 
+                debugString += ("Unknown ingredient: -" + System.Math.Round(entry.Value * 100, 2) +
                                 " pts" + "\n");
             }
         }
         // Check if liquid has enough volume
         if (liquid.lv.level < Beverage.idealLevel) {
             score -= (idealLevel - liquid.lv.level);
-            debugString += ("Insufficient volume: -" + 
+            debugString += ("Insufficient volume: -" +
                             System.Math.Round((idealLevel - liquid.lv.level) * 100, 2) + " pts" + "\n");
         }
         // Check if liquid has the right temperature
         if (Mathf.Abs(temperature - liquid.temperature) > 10) {
             float minusScore = (Mathf.Abs(temperature - liquid.temperature) - 10) * 0.01f;
             score -= minusScore;
-            debugString += ("Temperature: -" + 
+            debugString += ("Temperature: -" +
                             System.Math.Round(minusScore * 100, 2) + " pts" + "\n");
         }
 
@@ -156,6 +156,74 @@ public class Beverage
             foreach (KeyValuePair<Ingredient.IngredientType, float> entry in beverage.ingredientAmounts)
             {
                 if (liquid.GetIngredientRatio(entry.Key) == 0) {
+                    continue;
+                }
+            }
+            return beverage;
+        }
+        return null;
+    }
+
+    public float DebugBeverageScore(IngredientManager ingredientManager, out string debugString)
+    {
+        debugString = "";
+        float score = 0;
+        // Check if liquid contains the right ratios of ingredients
+        foreach (KeyValuePair<Ingredient.IngredientType, float> entry in ingredientAmounts)
+        {
+            float trueRatio = ingredientManager.GetIngredientRatio(entry.Key);
+            if (trueRatio == 0) {
+                debugString = "Missing ingredient " + entry.Key.ToString();
+                debugString += "\nFinal score: 0 pts";
+                return 0;
+            }
+            float error = Mathf.Abs(entry.Value - trueRatio);
+            if (error > 0.1) {
+                float addScore = entry.Value * (1 - error + 0.1f);
+                debugString += (entry.Key.ToString() + " " +
+                                System.Math.Round((1 - error + 0.1f) * 100, 2) +
+                                "%: " + System.Math.Round(addScore * 100, 2) + " pts" + "\n");
+                score += addScore;
+            }  else {
+                debugString += (entry.Key.ToString() + " 100%: " +
+                                System.Math.Round(entry.Value * 100, 2) + " pts" + "\n");
+                score += entry.Value;
+            }
+        }
+        // Check if liquid has any unknown ingredients
+        foreach (KeyValuePair<Ingredient.IngredientType, float> entry in ingredientManager.IngredientAmounts)
+        {
+            if (!ingredientAmounts.ContainsKey(entry.Key)) {
+                // Unknown ingredient in beverage
+                score -= entry.Value;
+                debugString += "Unknown ingredient: -" + System.Math.Round(entry.Value * 100, 2) + " pts\n";
+            }
+        }
+        // Check if liquid has enough volume
+        var fillAmountPercent = ingredientManager.liquidContainer.FillAmountPercent;
+        if (fillAmountPercent < idealLevel) {
+            var levelPenalty = System.Math.Abs(idealLevel - fillAmountPercent);
+            score -= levelPenalty;
+            debugString += "Insufficient volume: -" + System.Math.Round(levelPenalty * 100, 2) + " pts" + "\n";
+        }
+        // Check if liquid has the right temperature
+        if (Mathf.Abs(temperature - ingredientManager.Temperature) > 10) {
+            float minusScore = (Mathf.Abs(temperature - ingredientManager.Temperature) - 10) * 0.01f;
+            score -= minusScore;
+            debugString += "Temperature: -" + System.Math.Round(minusScore * 100, 2) + " pts" + "\n";
+        }
+
+        debugString += "Score: " + System.Math.Round(score * 100, 2) + " pts" + "\n";
+        return score;
+    }
+
+    public static Beverage IdentifyBeverage(IngredientManager ingredientManager)
+    {
+        foreach (Beverage beverage in BeverageList.list)
+        {
+            foreach (KeyValuePair<Ingredient.IngredientType, float> entry in beverage.ingredientAmounts)
+            {
+                if (ingredientManager.GetIngredientRatio(entry.Key) == 0) {
                     continue;
                 }
             }

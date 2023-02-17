@@ -28,12 +28,12 @@ public class Ingredient
     public Color32[] ingredientColors = new Color32[]
     {
         Color.black,
-        Color.white,
-        Color.white,
+        new Color32(253, 255, 237, 255),
+        new Color32(253, 255, 237, 255),
         new Color32(44, 21, 0, 255),
         new Color32(173, 129, 45, 255),
         new Color32(173, 129, 45, 255),
-        new Color32(255, 255, 255, 255),
+        new Color32(173, 129, 45, 255),
         new Color32(255, 255, 255, 255),
         new Color32(255, 255, 255, 255),
         new Color32(255, 255, 255, 255),
@@ -70,6 +70,6 @@ public class Ingredient
     {
         ingredientType = type;
         this.color = (Color)(color == null ? ingredientColors[(int)type] : color);
-        this.temperature = temperature == -1 ? ingredientTemps[(int)type] : temperature; 
+        this.temperature = temperature == -1 ? ingredientTemps[(int)type] : temperature;
     }
 }

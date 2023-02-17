@@ -72,4 +72,12 @@ public class AlphaGameplayManager : MonoBehaviour
         performanceText.text = message;
         startTime = -1;
     }
+
+    public void CompleteRound(IngredientManager ingredientManager)
+    {
+        beverageObject = ingredientManager.gameObject;
+        beverage.DebugBeverageScore(ingredientManager, out string message);
+        performanceText.text = message;
+        startTime = -1;
+    }
 }

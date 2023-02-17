@@ -10,7 +10,7 @@ public class SteamWandCollisionDetector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -20,14 +20,15 @@ public class SteamWandCollisionDetector : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name == "LiquidSurface") {
+        Debug.Log(other);
+        if (other.gameObject.name == "Fluid") {
             steamWand.SetTouchingMilk(true, other.gameObject);
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.name == "LiquidSurface") {
+        if (other.gameObject.name == "Fluid") {
             steamWand.SetTouchingMilk(false);
         }
     }

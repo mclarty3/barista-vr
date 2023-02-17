@@ -36,14 +36,14 @@ public class ImprovedLiquid : MonoBehaviour
     public bool SHOWINGREDIENTS = false;
     public bool QUERYBEVERAGETYPE = false;
     public bool useNewPouringSystem = false;
-    
-    public Dictionary<Ingredient, float> amounts = new Dictionary<Ingredient, float>();
+
+    public Dictionary<Ingredient, float> amounts = new();
     [System.NonSerialized]
     public LiquidVolume lv;
-    
+
     private float meshVolume;
     private float referenceVolume;
-    private ParticleManager particleManager = null;
+    // private ParticleManager particleManager = null;
     private GameManager gameManager;
     private bool empty = false;
 
@@ -55,7 +55,7 @@ public class ImprovedLiquid : MonoBehaviour
         }
 
         if (lv.level > 0) {
-            Ingredient newIngredient = new Ingredient(ingredientType);
+            Ingredient newIngredient = new(ingredientType);
             amounts.Add(newIngredient, lv.level);
             temperature = newIngredient.temperature;
         }
@@ -63,26 +63,26 @@ public class ImprovedLiquid : MonoBehaviour
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         referenceVolume = GetMeshVolume.VolumeOfMesh(
-            gameManager.referenceLiquidVolume.gameObject.GetComponent<MeshFilter>().sharedMesh, 
+            gameManager.referenceLiquidVolume.gameObject.GetComponent<MeshFilter>().sharedMesh,
             gameManager.referenceLiquidVolume.gameObject.transform);
-        meshVolume = GetMeshVolume.VolumeOfMesh(lv.gameObject.GetComponent<MeshFilter>().sharedMesh, 
+        meshVolume = GetMeshVolume.VolumeOfMesh(lv.gameObject.GetComponent<MeshFilter>().sharedMesh,
                                                 lv.gameObject.transform);
-        // Debug.Log(transform.parent.name + " has " + meshVolume + " volume and " + 
-        //           GetVolumeInOz(meshVolume) + " oz with " + 
+        // Debug.Log(transform.parent.name + " has " + meshVolume + " volume and " +
+        //           GetVolumeInOz(meshVolume) + " oz with " +
         //           GetVolumeInOz(GetVolumeFilled()) + " oz filled");
 
-        particleManager = transform.parent.GetComponentInChildren<ParticleManager>();
-        if (particleManager != null) {
-            minDropsPerFrame = _minDropsPerFrame;
-            maxDropsPerFrame = _maxDropsPerFrame;
-        }
+        // particleManager = transform.parent.GetComponentInChildren<ParticleManager>();
+        // if (particleManager != null) {
+        //     minDropsPerFrame = _minDropsPerFrame;
+        //     maxDropsPerFrame = _maxDropsPerFrame;
+        // }
     }
 
     // Update is called once per frame
     void Update()
     {
         if (liquidSurfaceCollider != null)
-        {    
+        {
             Vector3 liquidPos = transform.position;
             liquidPos.y = lv.liquidSurfaceYPosition;
             liquidSurfaceCollider.transform.position = liquidPos;
@@ -115,7 +115,7 @@ public class ImprovedLiquid : MonoBehaviour
         }
     }
 
-    void DebugIngredients() 
+    void DebugIngredients()
     {
         string ingredients = "";
         foreach (KeyValuePair<Ingredient, float> kvp in amounts) {
@@ -135,25 +135,33 @@ public class ImprovedLiquid : MonoBehaviour
                                                             transform.up).normalized;
                 Vector3 finalPos = (spillPos + (offsetVector * pourHorizontalOffset) +
                                     (transform.up * pourVerticalOffset));
-            if (particleManager == null) {
-                NewPour(finalPos, spillAmount);
-            } else {
-                ParticlePour(finalPos, spillAmount);
-            }
-        } else if (particleManager != null && particleManager.isPouring) {
-            particleManager.StopPouring();
+            // if (particleManager == null) {
+            NewPour(finalPos, spillAmount);
+            // } else {
+            //     ParticlePour(finalPos, spillAmount);
+            // }
         }
+        // else if (particleManager != null && particleManager.isPouring) {
+        //     particleManager.StopPouring();
+        // }
     }
 
-    void ParticlePour(Vector3 position, float spillAmount) 
-    {
-        particleManager.particleFlowRate = (int)Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame,
-                                                           spillAmount);
-        particleManager.transform.position = position;
-        Vector3 dir = position - transform.position;
-        particleManager.transform.rotation = Quaternion.LookRotation(dir);
-        particleManager.StartPouring(amounts);
-    }
+    // void ParticlePour(Vector3 position, float spillAmount)
+    // {
+    //     // particleManager.particleFlowRate = (int)Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame,
+    //     //                                                    spillAmount);
+    //     // particleManager.StartPouring(amounts);
+
+    //     Vector3 dir = position - transform.position;
+
+    //     var main = particleManager.particles.main;
+    //     main.startColor = lv.liquidColor1;
+
+    //     main.startSize = spillAmount;
+    //     particleManager.transform.position = position;
+    //     particleManager.transform.rotation = Quaternion.LookRotation(dir);
+    //     particleManager.particles.Play();
+    // }
 
     public void ReduceLiquid(int lostDrops)
     {
@@ -211,14 +219,14 @@ public class ImprovedLiquid : MonoBehaviour
         }
         return 0;
     }
-    
+
     private void NewPour(Vector3 spillPos, float spillAmount)
     {
         int drops = Mathf.FloorToInt(Mathf.Lerp(minDropsPerFrame, maxDropsPerFrame, spillAmount * 1.6f));
         LiquidSpout.PourLiquid(spillPos, spillPos - transform.position,
-                               new List<Ingredient>(amounts.Keys), lv.liquidColor1, temperature, 1, 25, 
-                               liquidDropPrefab, 0.05f * liquidScatter, 0.25f, 1.25f, pourForceModifier, 
-                               drops: drops, randomForce: false);
+                               new List<Ingredient>(amounts.Keys), lv.liquidColor1, temperature, liquidDropPrefab,
+                               new Vector2(1, 25), Vector2.zero, liquidScatter, new Vector2(0.25f, 1.25f),
+                               pourForceModifier, drops);
         if (!infiniteLiquid)
         {
             float lostLevel = GetLevelFromDrops(drops);
@@ -250,7 +258,7 @@ public class ImprovedLiquid : MonoBehaviour
         Debug.Log("adding level: " + level);
     }
 
-    public void AddLiquid(Ingredient ingredient, float amount) 
+    public void AddLiquid(Ingredient ingredient, float amount)
     {
         if (amount <= 0) return;
 
@@ -261,12 +269,10 @@ public class ImprovedLiquid : MonoBehaviour
         }
 
         float newLevel = amount + lv.level;
-        float weight = amount / newLevel;
         lv.liquidColor1 = HSBColor.Lerp(HSBColor.FromColor(lv.liquidColor1),
                                         HSBColor.FromColor(ingredient.color),
                                         amount / newLevel).ToColor();
-        this.temperature = ((this.temperature * lv.level / newLevel) + 
-                            (ingredient.temperature * amount / newLevel));
+        temperature = (temperature * lv.level / newLevel) + (ingredient.temperature * amount / newLevel);
         lv.level = newLevel;
     }
 
@@ -283,9 +289,9 @@ public class ImprovedLiquid : MonoBehaviour
     public float GetVolumeFromDrops(int numDrops, int pourReceive = 1)
     {
         if (pourReceive == 1) {
-            return (referenceVolume * numDrops) / (20 * pouredDropsPerOz);
+            return referenceVolume * numDrops / (20 * pouredDropsPerOz);
         } else if (pourReceive == -1) {
-            return (referenceVolume * numDrops) / (20 * receivedDropsPerOz);
+            return referenceVolume * numDrops / (20 * receivedDropsPerOz);
         } else {
             Debug.LogError("Error: pourReceive must be either -1 or 1. Got " + pourReceive);
             return 0;
@@ -297,9 +303,9 @@ public class ImprovedLiquid : MonoBehaviour
         return GetVolumeFromDrops(numDrops, pourReceive) / meshVolume;
     }
 
-    public void SetMilkSteamed(bool milkSteamed)
+    public void SetMilkSteamed()
     {
-        ChangeIngredient(new Ingredient(Ingredient.IngredientType.Milk), 
+        ChangeIngredient(new Ingredient(Ingredient.IngredientType.Milk),
                          new Ingredient(Ingredient.IngredientType.SteamedMilk));
     }
 }

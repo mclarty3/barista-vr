@@ -7,7 +7,7 @@ public class ReturnToPlayArea : MonoBehaviour
     [Tooltip("The center of the play area; used for calculating distance")]
     public Transform origin;
     [Tooltip("The minimum distance the object must be from the origin before being respawned")]
-    public float distance = 7f;
+    public float distance = 1f;
     [Tooltip("The time in seconds the object spends outside the zone before respawning")]
     public float timeBeforeRespawn = 3f;
     [Tooltip("The position and rotation the object will be respawned at")]

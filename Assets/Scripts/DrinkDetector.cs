@@ -10,22 +10,26 @@ public class DrinkDetector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void OnTriggerEnter(Collider other)
     {
         GameObject otherObj = FindParentWithTag(other.gameObject, "Cup");
         if (otherObj != null) {
-            ImprovedLiquid liquid = otherObj.GetComponentInChildren<ImprovedLiquid>();
-            if (liquid != null) {
-                agm.CompleteRound(liquid);
+            // ImprovedLiquid liquid = otherObj.GetComponentInChildren<ImprovedLiquid>();
+            // if (liquid != null) {
+            //     agm.CompleteRound(liquid);
+            // }
+            var ingredientManager = otherObj.GetComponent<IngredientManager>();
+            if (ingredientManager != null) {
+                agm.CompleteRound(ingredientManager);
             }
         }
     }

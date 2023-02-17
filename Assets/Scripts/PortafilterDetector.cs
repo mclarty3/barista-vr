@@ -58,17 +58,24 @@ public class PortafilterDetector : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.transform.parent.tag == "Portafilter") {
-            if (other.transform.parent.GetComponent<Rigidbody>().useGravity) {
-                if (portafilterAttached == PortafilterPos.None) {
-                    Debug.Log("Attaching because portafilterAttached = " + portafilterAttached);
-                    Attach(other.gameObject);
-                }
-            } else if (portafilter != null) {
-                Detach(other.gameObject);
-            } else if (!portafilterHighlight.activeSelf) {
-                portafilterHighlight.SetActive(true);
+        try {
+            if (other.transform.parent.parent.tag != "Portafilter") {
+                return;
             }
+        } catch {
+            return;
+        }
+
+        GameObject triggeredPortafilter = other.transform.parent.parent.gameObject;
+        if (triggeredPortafilter.GetComponent<Rigidbody>().useGravity) {
+            if (portafilterAttached == PortafilterPos.None) {
+                Debug.Log("Attaching because portafilterAttached = " + portafilterAttached);
+                Attach(triggeredPortafilter);
+            }
+        } else if (portafilter != null) {
+            Detach(triggeredPortafilter);
+        } else if (!portafilterHighlight.activeSelf) {
+            portafilterHighlight.SetActive(true);
         }
     }
 
@@ -84,7 +91,7 @@ public class PortafilterDetector : MonoBehaviour
     void Attach(GameObject obj)
     {
         portafilterAttached = detectorType;
-        portafilter = obj.transform.parent.gameObject.GetComponent<Portafilter>();
+        portafilter = obj.GetComponent<Portafilter>();
         portafilter.detector = this;
         portafilterHighlight.SetActive(false);
         portafilter.transform.position = portafilterPos.position;
@@ -113,11 +120,11 @@ public class PortafilterDetector : MonoBehaviour
 
     /* Filling portafilter with grounds from coffee grinder */
 
-    public void TryFillPortafilter() 
+    public void TryFillPortafilter()
     {
-        if (portafilter != null && 
-            detectorType == PortafilterPos.Grinder && 
-            portafilter.espressoStatus == Portafilter.EspressoStatus.None) 
+        if (portafilter != null &&
+            detectorType == PortafilterPos.Grinder &&
+            portafilter.espressoStatus == Portafilter.EspressoStatus.None)
         {
             portafilter.Fill();
             beanGrinderAudioSource.Play();

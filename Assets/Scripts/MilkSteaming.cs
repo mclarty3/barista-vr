@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnitySimpleLiquid;
 
 public class MilkSteaming : MonoBehaviour
 {
@@ -11,7 +12,8 @@ public class MilkSteaming : MonoBehaviour
     private bool touchingMilk = false;
     private bool steamWandOn = false;
     private bool steamedMilk = false;
-    public ImprovedLiquid milk = null;
+    // public ImprovedLiquid milk = null;
+    public IngredientManager milk = null;
     public Transform steamWandBottom;
     public Transform steamWandTop;
     public AudioSource audioSource;
@@ -30,7 +32,7 @@ public class MilkSteaming : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GetMilkTempText = () => System.Math.Round(milk.temperature, 1).ToString();
+        GetMilkTempText = () => System.Math.Round(milk.Temperature, 1).ToString();
     }
 
     // Update is called once per frame
@@ -43,27 +45,32 @@ public class MilkSteaming : MonoBehaviour
         }
 
         if (steamWandOn && milk != null) {
-            milk.temperature += degreesPerSecond * Time.deltaTime;
+            milk.Temperature += degreesPerSecond * Time.deltaTime;
             milkStatusText.text = "Steaming\n\nMilk temp\n\n" + GetMilkTempText() + "°F";
 
-            if (milk.temperature >= 125 && !steamedMilk)
+            if (milk.Temperature >= 125 && !steamedMilk)
             {
-                milk.SetMilkSteamed(true);
+                milk.SetMilkSteamed();
                 steamedMilk = true;
             }
         }
     }
 
+    private bool DetectMilkPitcher(GameObject other)
+    {
+        return other.name == "Fluid" && other.transform.parent.name == "MilkPitcher";
+    }
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.name == "LiquidSurface") {
+        if (DetectMilkPitcher(other.gameObject)) {
             SetTouchingMilk(true, other.gameObject);
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.name == "LiquidSurface") {
+        if (DetectMilkPitcher(other.gameObject)) {
             SetTouchingMilk(false);
         }
     }
@@ -96,7 +103,7 @@ public class MilkSteaming : MonoBehaviour
                 // Play milk steam wand off sound
                 StopSteamMilk(false);
             }
-            
+
             steamParticles.Stop();
         }
     }
@@ -105,10 +112,10 @@ public class MilkSteaming : MonoBehaviour
     {
         Debug.Log("SetTouchingMilk(" + touching + ")");
         if (touching && liquidSurface != null &&
-            liquidSurface.transform.parent.TryGetComponent<ImprovedLiquid>(out milk)) 
+            liquidSurface.transform.parent.TryGetComponent(out milk))
         {
             touchingMilk = true;
-            if (milk.temperature >= 125) {
+            if (milk.Temperature >= 125) {
                 steamedMilk = true;
             }
         } else {
@@ -132,7 +139,7 @@ public class MilkSteaming : MonoBehaviour
         }
     }
 
-    void SteamMilk() 
+    void SteamMilk()
     {
         milkStatusText.text = "Steaming\n\nMilk temp\n\n" + GetMilkTempText() + "°F";
         StartCoroutine("PlayMilkSteamWandSound");
@@ -155,7 +162,7 @@ public class MilkSteaming : MonoBehaviour
         }
     }
 
-    IEnumerator PlayMilkSteamWandSound() 
+    IEnumerator PlayMilkSteamWandSound()
     {
         audioSource.Stop();
         audioSource.clip = touchingMilkStartSound;

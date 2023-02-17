@@ -13,8 +13,8 @@ public class CupStack : MonoBehaviour
     public Transform cupSpawnPoint;
 
     private bool grabbed = false;
-    private float leaveProjectedDistance = 0.5f;
-    private float leaveHeightDifference = 2.0f;
+    private float leaveProjectedDistance = 0.09f;
+    private float leaveHeightDifference = 0.14f;
 
     // Start is called before the first frame update
     void Start()
@@ -31,30 +31,26 @@ public class CupStack : MonoBehaviour
             OnCupGrabbed();
             grabbed = true;
         }
-        else if (grabbed) 
+        else if (grabbed)
         {
-            Vector3 grabbedCenter = (grabbedCup.transform.Find("Pipe").
-                                     GetComponent<Renderer>().bounds.center);
-            float projectedDistance = Vector2.Distance(
-                Vector3.ProjectOnPlane(this.transform.position, Vector3.up),
-                Vector3.ProjectOnPlane(grabbedCenter, Vector3.up));
-            float heightDistance = grabbedCenter.y - this.transform.position.y;
-            if (projectedDistance >= leaveProjectedDistance || heightDistance >= leaveHeightDifference) 
+            Vector3 distance = newCup.transform.position - grabbedCup.transform.position;
+            float horizontalDistance = new Vector2(distance.x, distance.z).magnitude;
+            float verticalDistance = Mathf.Abs(distance.y);
+
+            if (horizontalDistance >= leaveProjectedDistance || verticalDistance >= leaveHeightDifference)
             {
-                Debug.Log("Leaving! Projected: " + projectedDistance + " Height: " + heightDistance);
                 OnCupExit();
                 grabbed = false;
             }
         }
     }
 
-    private void OnCupGrabbed() 
+    private void OnCupGrabbed()
     {
         ToggleCupColliders(dormantCup, false);
         dormantCup.GetComponent<Rigidbody>().isKinematic = false;
         grabbedCup = newCup;
-        newCup = Instantiate(cupPrefab, cupSpawnPoint.position, 
-                             Quaternion.LookRotation(Vector3.back, Vector3.down)) as GameObject;
+        newCup = Instantiate(cupPrefab, cupSpawnPoint.position, Quaternion.LookRotation(Vector3.back, Vector3.down));
         newCup.GetComponent<Rigidbody>().isKinematic = true;
     }
 
@@ -68,8 +64,6 @@ public class CupStack : MonoBehaviour
     {
         Collider[] cupColliders = cup.GetComponentsInChildren<Collider>();
 
-        Debug.Log(cupColliders.Length);
-        
         foreach (Collider collider in cupColliders) {
             collider.enabled = active;
         }
