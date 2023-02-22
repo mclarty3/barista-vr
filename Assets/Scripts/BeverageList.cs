@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BeverageList 
+public class BeverageList
 {
     static public System.Func<float, float> PumpsToRatio = pumps => pumps * 0.02f;
 
@@ -16,7 +16,7 @@ public class BeverageList
         ),
         new Beverage("Steamed Milk", 145, new Dictionary<Ingredient.IngredientType, float>()
             {
-                {Ingredient.IngredientType.Milk, 1}
+                {Ingredient.IngredientType.SteamedMilk, 1}
             }
         ),
         new Beverage("Cold Milk", 40, new Dictionary<Ingredient.IngredientType, float>()

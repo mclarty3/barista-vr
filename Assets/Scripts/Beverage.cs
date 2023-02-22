@@ -168,6 +168,7 @@ public class Beverage
     {
         debugString = "";
         float score = 0;
+
         // Check if liquid contains the right ratios of ingredients
         foreach (KeyValuePair<Ingredient.IngredientType, float> entry in ingredientAmounts)
         {
@@ -178,18 +179,19 @@ public class Beverage
                 return 0;
             }
             float error = Mathf.Abs(entry.Value - trueRatio);
-            if (error > 0.1) {
-                float addScore = entry.Value * (1 - error + 0.1f);
-                debugString += (entry.Key.ToString() + " " +
-                                System.Math.Round((1 - error + 0.1f) * 100, 2) +
-                                "%: " + System.Math.Round(addScore * 100, 2) + " pts" + "\n");
+            float pctError = error / entry.Value;
+            if (pctError > 0.1) {
+                float addScore = entry.Value * (1 - pctError);
                 score += addScore;
+                debugString += entry.Key.ToString() + " (" + trueRatio + "/" + entry.Value + ") ";
+                debugString += System.Math.Round((1 - pctError) * 100, 2) + "%: ";
+                debugString += "%: -" + System.Math.Round(addScore * 100, 2) + " pts" + "\n";
             }  else {
-                debugString += (entry.Key.ToString() + " 100%: " +
-                                System.Math.Round(entry.Value * 100, 2) + " pts" + "\n");
                 score += entry.Value;
+                debugString += entry.Key.ToString() + " 100%: " + System.Math.Round(entry.Value * 100, 2) + " pts" + "\n";
             }
         }
+
         // Check if liquid has any unknown ingredients
         foreach (KeyValuePair<Ingredient.IngredientType, float> entry in ingredientManager.IngredientAmounts)
         {
@@ -199,18 +201,23 @@ public class Beverage
                 debugString += "Unknown ingredient: -" + System.Math.Round(entry.Value * 100, 2) + " pts\n";
             }
         }
+
         // Check if liquid has enough volume
         var fillAmountPercent = ingredientManager.liquidContainer.FillAmountPercent;
-        if (fillAmountPercent < idealLevel) {
+        var volumeDifference = Mathf.Max(5, Mathf.Abs(idealLevel - fillAmountPercent)) - 5;
+
+        if (volumeDifference > 0) {
             var levelPenalty = System.Math.Abs(idealLevel - fillAmountPercent);
             score -= levelPenalty;
             debugString += "Insufficient volume: -" + System.Math.Round(levelPenalty * 100, 2) + " pts" + "\n";
         }
+
         // Check if liquid has the right temperature
-        if (Mathf.Abs(temperature - ingredientManager.Temperature) > 10) {
-            float minusScore = (Mathf.Abs(temperature - ingredientManager.Temperature) - 10) * 0.01f;
-            score -= minusScore;
-            debugString += "Temperature: -" + System.Math.Round(minusScore * 100, 2) + " pts" + "\n";
+        var temperatureDifference = Mathf.Max(5, Mathf.Abs(temperature - ingredientManager.Temperature)) - 5;
+        if (temperatureDifference > 0) {
+            score -= temperatureDifference / 100;
+            debugString += "Temperature (" + ingredientManager.Temperature + "/" + temperature + "): ";
+            debugString += "-" + System.Math.Round(temperatureDifference, 2) + " pts" + "\n";
         }
 
         debugString += "Score: " + System.Math.Round(score * 100, 2) + " pts" + "\n";

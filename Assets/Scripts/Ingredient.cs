@@ -46,13 +46,13 @@ public class Ingredient
         36,
         145,
         160,
-        65,
-        65,
-        65,
-        65,
-        65,
-        65,
-        65,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
     };
 
     public IngredientType ingredientType;
