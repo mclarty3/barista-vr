@@ -65,14 +65,6 @@ public class AlphaGameplayManager : MonoBehaviour
         startTime = -1;
     }
 
-    public void CompleteRound(ImprovedLiquid liquid)
-    {
-        beverageObject = liquid.gameObject;
-        beverage.DebugBeverageScore(liquid, out string message);
-        performanceText.text = message;
-        startTime = -1;
-    }
-
     public void CompleteRound(IngredientManager ingredientManager)
     {
         beverageObject = ingredientManager.gameObject;
