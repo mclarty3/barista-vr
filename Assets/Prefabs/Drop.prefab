@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5987482486505084434}
   - component: {fileID: 6753315174529229373}
   - component: {fileID: 4690052112255158508}
-  - component: {fileID: -1561392994528254980}
   m_Layer: 9
   m_Name: Drop
   m_TagString: Untagged
@@ -31,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.6693892, y: 3.4738362, z: -3.4441068}
   m_LocalScale: {x: 0.0032, y: 0.0032, z: 0.0032}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -54,6 +54,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -113,56 +114,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &-1561392994528254980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2351257203509581200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 060ec825b73c59341825689867952a64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dropColor: {r: 0, g: 0, b: 0, a: 0}
-  dropLife: 3
-  ingredient:
-    ingredientColors:
-    - serializedVersion: 2
-      rgba: 4278190080
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4278195500
-    - serializedVersion: 2
-      rgba: 4281172397
-    - serializedVersion: 2
-      rgba: 4281172397
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4294967295
-    - serializedVersion: 2
-      rgba: 4294967295
-    ingredientTemps:
-    - 0
-    - 36
-    - 145
-    - 160
-    - 65
-    - 65
-    - 65
-    - 65
-    - 65
-    - 65
-    - 65
-    ingredientType: 0
-    color: {r: 1, g: 1, b: 1, a: 1}
-    temperature: 0
