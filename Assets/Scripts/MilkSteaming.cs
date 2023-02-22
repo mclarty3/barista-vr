@@ -110,9 +110,9 @@ public class MilkSteaming : MonoBehaviour
 
     public void SetTouchingMilk(bool touching, GameObject liquidSurface = null)
     {
-        Debug.Log("SetTouchingMilk(" + touching + ")");
         if (touching && liquidSurface != null &&
-            liquidSurface.transform.parent.TryGetComponent(out milk))
+            liquidSurface.transform.parent.TryGetComponent(out milk) &&
+            milk.Temperature != -1)
         {
             touchingMilk = true;
             if (milk.Temperature >= 125) {

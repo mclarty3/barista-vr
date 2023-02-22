@@ -22,7 +22,7 @@ namespace UnitySimpleLiquid
 		[Tooltip("The point from which the liquid will be poured. Only used if liquidContainer is a liquid source")]
 		public Transform pourPoint;
 		[Tooltip("Determines whether the liquid will be poured automatically when the pour point reaches a certain angle")]
-		public bool angleBasedPour = true;
+		public bool angleBasedPour = false;
 		[Tooltip("The angle at which the liquid will be poured. Only used if angleBasedPour is true")]
 		public float pourAngle = 45f;
 		[Tooltip("Toggles manual pouring. Only used if angleBasedPour is false and liquidContainer is a liquid source")]
@@ -35,9 +35,17 @@ namespace UnitySimpleLiquid
         public float splitSpeed = 2f;
 		[Tooltip("Number number of objects the liquid will hit off and continue flowing")]
 		public int maxEdgeDrops = 4;
+		[Tooltip("Multiplier for the delay between liquid leaving this container and being transferred to another")]
+		public float transferLiquidDelayMultiplier = 1.2f;
 		private int currentDrop;
-
 		public ParticleSystem particlesPrefab;
+
+		[Header("Pour position settings")]
+		[Tooltip("The horizontal offset of the pour point relative to the rim of the bottleneck")]
+		public float pourOffsetHorizontal = 0f;
+		[Tooltip("The vertical offset of the pour point relative to the rim of the bottleneck")]
+		public float pourOffsetVertical = 0f;
+
 
         #region Particles
         private ParticleSystem particles;
@@ -71,8 +79,17 @@ namespace UnitySimpleLiquid
             var mainModule = particlesInst.main;
             mainModule.startColor = liquidContainer.LiquidColor;
 
+			var trailModule = particlesInst.trails;
+			var alphaColor = liquidContainer.LiquidColor;
+			alphaColor.a = 0.4f;
+			trailModule.colorOverTrail = alphaColor;
+
             particlesInst.transform.localScale = Vector3.one * BottleneckRadiusWorld * scale;
             particlesInst.transform.position = splitPos;
+
+			if (pourPoint == null)
+				particlesInst.transform.rotation = Quaternion.LookRotation(bottleneckPlane.normal);
+
             particlesInst.Play();
         }
         #endregion
@@ -120,6 +137,9 @@ namespace UnitySimpleLiquid
 
 			// Find a position along the slope the side of the bottleneck radius
 			Vector3 min = BottleneckPos + bottleneckSlope * BottleneckRadiusWorld;
+
+			min += pourOffsetHorizontal * (min - BottleneckPos).normalized;
+			min += pourOffsetVertical * transform.up;
 
 			return min;
 
@@ -287,20 +307,31 @@ namespace UnitySimpleLiquid
 			//RaycastHit is a struct which gives us everything we need
 			RaycastHit containerHit = FindLiquidContainer(splitPos, gameObject, out var splitController);
 
-			// We directly hit a LiquidCollider
-			if (splitController != null)
+			if (splitController != null || containerHit.collider != null)
 			{
-				TransferLiquid(containerHit, liquidStep, flowScale, liquidSource, splitController);
-			}
-			else if (containerHit.collider != null)
-			{
-				TransferLiquid(containerHit, liquidStep, flowScale, liquidSource);
+				if (splitController == null)
+				{
+					splitController = containerHit.collider.GetComponent<SplitController>();
+				}
+
+				float distanceToContainer = Vector3.Distance(splitPos, splitController.transform.position);
+				// use gravity to calculate time to reach container
+				float gravity = Physics.gravity.magnitude * Particles.main.gravityModifierMultiplier;
+				float timeToReachContainer = Mathf.Sqrt(2 * distanceToContainer / gravity) * transferLiquidDelayMultiplier;
+				StartCoroutine(DelayTransferLiquid(containerHit, liquidStep, flowScale, liquidSource, splitController, timeToReachContainer));
 
 			}
 			// Start particles effect
 			StartEffect(splitPos, flowScale);
 		}
 
+		IEnumerator DelayTransferLiquid(RaycastHit hit, float lostPercentAmount, float scale, bool liquidSource,
+										SplitController liquid, float delay)
+		{
+			yield return new WaitForSeconds(delay);
+
+			TransferLiquid(hit, lostPercentAmount, scale, liquidSource, liquid);
+		}
 
 		//Used for Gizmo only
 		private Vector3 raycasthit;
